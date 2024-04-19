@@ -28,32 +28,45 @@ router.post('/register', async (req, res) => {
 
 
 // Login route
+// Login route
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
     try {
-        // Check if user exists
         const user = await User.findOne({ username });
         if (!user) {
             return res.status(400).send('User not found');
         }
 
-        // Compare the provided password with the hashed password in the database
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).send(user.password);
+            return res.status(400).send('Invalid Credentials');
         }
 
-        // Redirect to different pages based on the user role
+        req.session.userId = user._id;
+        req.session.username = user.username;
+        req.session.userRole = user.role;
+
+        // Redirect based on role
         if (user.role === 'teacher') {
-            res.redirect('/teacher-dashboard'); // Assuming you have a route for teacher dashboard
+            res.redirect('/teachers/teacher-dashboard');
         } else if (user.role === 'student') {
-            res.redirect('/student-dashboard'); // Assuming you have a route for student dashboard
+            res.redirect('/student-dashboard');
         }
     } catch (error) {
         res.status(500).send('Error logging in user.');
     }
 });
 
+router.get('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.redirect('/'); // redirect to home page if there's an error
+        }
+
+        res.clearCookie('connect.sid'); // Clear the session cookie
+        res.redirect('/login'); // Redirect to the login page
+    });
+});
 
 
 module.exports = router;

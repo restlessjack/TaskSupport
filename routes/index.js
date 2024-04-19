@@ -1,28 +1,19 @@
 const express = require('express');
 const router = express.Router();
 
+// Home page route
 router.get('/', (req, res) => {
     res.send('Welcome to the Task Management System!');
 });
 
-// Import user routes
-const userRoutes = require('./users');
-
-// Use user routes for '/users' endpoints
-router.use('/users', userRoutes);
-
-
-// Define a route handler for the '/register' endpointA
+// Register page route
 router.get('/register', (req, res) => {
-    res.render('register'); // Render the register page
+    res.render('register');
 });
-// Define a route handler for the '/login' endpoint
+
+// Login page route
 router.get('/login', (req, res) => {
-    res.render('login'); // Render the login page
+    res.render('login');
 });
-
-
-
-
 
 module.exports = router;

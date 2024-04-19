@@ -1,32 +1,57 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const indexRoutes = require('./routes/index');
-const userRoutes = require('./routes/users');
+const indexRoutes = require('./routes/index');  // General or home page routes
+const userRoutes = require('./routes/users');  // User-specific routes
+
+const teacherRoutes = require('./routes/teachers');  // User-specific routes
+const studentRoutes = require('./routes/students'); // Import the class router
+
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+
+// Database URI
+const mongoDbUrl = 'mongodb://localhost:27017/mydatabase';
+
 
 
 const app = express();
 const path = require('path');
 
-// Set the view engine to ejs
 app.set('view engine', 'ejs');
-
-// Set the directory where the views (templates) are located
 app.set('views', path.join(__dirname, 'views'));
-
-
 
 const port = process.env.PORT || 3000;
 
-mongoose.connect('mongodb://localhost:27017/mydatabase', {
-   
+// Database connection
+mongoose.connect(mongoDbUrl, {
+    
 });
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/', indexRoutes);
-app.use('/users', userRoutes);
+// Session configuration
+app.use(session({
+    secret: 'your_secret_key',
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: mongoDbUrl,
+        collectionName: 'sessions'
+    }),
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24 // 24 hours
+    }
+}));
+
+// Setup routes
+app.use('/', indexRoutes);  // Home and general routes
+app.use('/users', userRoutes);  // User specific routes
+// Use the class router for any requests to '/classes'
+
+app.use('/students', studentRoutes);
+app.use('/teachers', teacherRoutes);
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
