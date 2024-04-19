@@ -49,14 +49,13 @@ router.post('/create-class', verifyTeacher, async (req, res) => {
     }
 });
 
-// View All Classes by the Logged-in Teacher
 router.get('/view-classes', verifyTeacher, async (req, res) => {
     try {
         const classes = await Class.find({ teacher: req.session.userId }).populate('students', 'username');
-        res.json(classes);
+        res.render('view-classes', { classes });
     } catch (error) {
         console.error('Error retrieving classes:', error);
-        res.status(500).send('Failed to retrieve classes');
+        res.status(500).render('error', { message: 'Failed to load classes' });
     }
 });
 

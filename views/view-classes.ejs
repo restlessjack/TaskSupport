@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Classes</title>
+    <style>
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 10px;
+            margin-bottom: 5px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+        a {
+            text-decoration: none;
+            color: black;
+        }
+        button {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Your Classes</h1>
+    <ul>
+        <% classes.forEach(function(cls) { %>
+            <li>
+                <a href="/classes/view-class/<%= cls._id %>"><%= cls.name %></a> <!-- Link to view class details and tasks -->
+                <a href="/classes/edit/<%= cls._id %>" style="margin-left: 20px;">Edit</a> <!-- Link to edit class -->
+            </li>
+        <% }) %>
+    </ul>
+    <button onclick="location.href='/classes/create'">Add New Class</button> <!-- Button to add a new class -->
+</body>
+</html>
