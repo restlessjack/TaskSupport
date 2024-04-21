@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Record Attendance</title>
+</head>
+<body>
+    <h1>Record Attendance for <%= classInfo.name %></h1>
+    <form action="/attendances/attendance/<%= classInfo._id %>" method="post">
+        <ul>
+            <% classInfo.students.forEach((student, index) => { %>
+                <li>
+                    <%= student.username %>: 
+                    <select name="attendance[<%= index %>][status]" required>
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+                    </select>
+                    <input type="hidden" name="attendance[<%= index %>][student]" value="<%= student._id %>" />
+                </li>
+            <% }) %>
+        </ul>
+        <button type="submit">Submit Attendance</button>
+    </form>
+    
+</body>
+</html>

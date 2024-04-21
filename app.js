@@ -7,6 +7,8 @@ const userRoutes = require('./routes/users');  // User-specific routes
 const teacherRoutes = require('./routes/teachers');  // User-specific routes
 const studentRoutes = require('./routes/students'); // Import the class router
 const classRoutes = require('./routes/classes');  // Adjust the path according to your file structure
+const attendanceRoutes = require('./routes/attendances');  // Adjust the path according to your file structure
+
 
 
 const session = require('express-session');
@@ -55,6 +57,7 @@ app.use('/users', userRoutes);  // User specific routes
 app.use('/students', studentRoutes);
 app.use('/teachers', teacherRoutes);
 app.use('/classes', classRoutes);  // This mounts your router on '/classes'
+app.use('/attendances', attendanceRoutes);
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);

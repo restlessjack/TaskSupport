@@ -87,7 +87,7 @@ router.get('/view-class/:id', verifyTeacher, async (req, res) => {
         if (!classInfo) {
             return res.status(404).send('Class not found');
         }
-        console.log(classInfo);
+        
         res.render('class-details', { classInfo }); // Render class details page
     } catch (error) {
         console.error('Error retrieving class details:', error);

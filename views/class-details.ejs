@@ -20,11 +20,34 @@
         }
         button {
             cursor: pointer;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
     <h1>Class: <%= classInfo.name %></h1>
-    
+    <h2>Student List:</h2>
+    <ul>
+        <% if (classInfo.students && classInfo.students.length > 0) { %>
+            <% classInfo.students.forEach(function(student) { %>
+                <li><%= student.username %></li>
+            <% }) %>
+        <% } else { %>
+            <li>No students assigned</li>
+        <% } %>
+    </ul>
+    <!-- Button to create attendance report -->
+    <form action="/classes/attendance/<%= classInfo._id %>" method="get">
+        <button type="submit">Create Attendance Report</button>
+    </form>
 </body>
 </html>
