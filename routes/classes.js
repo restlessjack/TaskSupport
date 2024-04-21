@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const Class = require('../models/class');
 const User = require('../models/user');
+const { calculatePercent } = require('../utils/calculationUtils');
+const Attendance = require('../models/attendance');
+
 
 // Middleware to verify if the user is a teacher
 function verifyTeacher(req, res, next) {
@@ -82,18 +85,52 @@ router.get('/view-class/:id', verifyTeacher, async (req, res) => {
     try {
         const classId = req.params.id;
         const classInfo = await Class.findById(classId)
-            .populate('students', 'username') // Populate student details
+            .populate('students', 'username')
+            .populate({
+                path: 'attendanceRecords',
+                populate: {
+                    path: 'records.student',
+                    model: 'User'
+                }
+            })
             .exec();
+
         if (!classInfo) {
             return res.status(404).send('Class not found');
         }
-        
-        res.render('class-details', { classInfo }); // Render class details page
+        const attendanceDocs = await Attendance.find({class: classId}).select('records.student records.status');
+
+        // Flatten the records into a single array of { student, status }
+        const allAttendanceRecords = attendanceDocs.flatMap(doc => doc.records.map(record => ({
+            student: record.student,
+            status: record.status
+        })));
+
+        console.log(JSON.stringify(allAttendanceRecords, null, 2));
+
+        // Calculate the total attendance percentage
+        const totalAttendancePercentage = calculatePercent(allAttendanceRecords);
+
+        let studentAttendancePercentages = classInfo.students.map(student => {
+            // Filter out records for this specific student
+            const studentRecords = allAttendanceRecords.filter(record => 
+                record.student.toString() === student._id.toString());
+            
+            const attendancePercentage = calculatePercent(studentRecords);
+            return {
+                username: student.username,
+                attendancePercentage
+            };
+        });
+
+        res.render('class-details', { classInfo, totalAttendancePercentage, studentAttendancePercentages });
     } catch (error) {
         console.error('Error retrieving class details:', error);
         res.status(500).render('error', { message: 'Failed to load class details' });
     }
 });
+
+
 
 
 

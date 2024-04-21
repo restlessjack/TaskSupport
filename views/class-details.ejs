@@ -35,18 +35,19 @@
 </head>
 <body>
     <h1>Class: <%= classInfo.name %></h1>
+    <h2>Total Attendance Percentage: <%= totalAttendancePercentage.toFixed(2) %> %</h2>
     <h2>Student List:</h2>
     <ul>
-        <% if (classInfo.students && classInfo.students.length > 0) { %>
-            <% classInfo.students.forEach(function(student) { %>
-                <li><%= student.username %></li>
+        <% if (studentAttendancePercentages && studentAttendancePercentages.length > 0) { %>
+            <% studentAttendancePercentages.forEach(function(student) { %>
+                <li><%= student.username %> - Attendance: <%= student.attendancePercentage.toFixed(2) %> %</li>
             <% }) %>
         <% } else { %>
             <li>No students assigned</li>
         <% } %>
     </ul>
     <!-- Button to create attendance report -->
-    <form action="/classes/attendance/<%= classInfo._id %>" method="get">
+    <form action="/attendances/attendance/<%= classInfo._id %>" method="get">
         <button type="submit">Create Attendance Report</button>
     </form>
 </body>

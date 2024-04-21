@@ -50,7 +50,7 @@ router.post('/login', async (req, res) => {
         if (user.role === 'teacher') {
             res.redirect('/teachers/teacher-dashboard');
         } else if (user.role === 'student') {
-            res.redirect('/student-dashboard');
+            res.redirect('/students/student-dashboard');
         }
     } catch (error) {
         res.status(500).send('Error logging in user.');
