@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Classes</title>
+</head>
+<body>
+    <h1>Welcome, <%= username %>!</h1>
+    <h2>Your Classes:</h2>
+    <ul>
+        <% classes.forEach(function(cl) { %>
+            <li><a href="/students/student-class-details/<%= cl._id %>"><%= cl.name %> - Taught by <%= cl.teacher.username %></a></li>
+        <% }); %>
+    </ul>
+</body>
+</html>
