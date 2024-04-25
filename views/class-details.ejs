@@ -31,6 +31,15 @@
         button:hover {
             background-color: #0056b3;
         }
+        input, textarea {
+            width: 95%;
+            padding: 12px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
@@ -46,9 +55,16 @@
             <li>No students assigned</li>
         <% } %>
     </ul>
-    <!-- Button to create attendance report -->
+    <ul>
     <form action="/attendances/attendance/<%= classInfo._id %>" method="get">
         <button type="submit">Create Attendance Report</button>
+    </form>
+    </ul>
+    <!-- Form to add a new task -->
+    <form action="/teachers/create-task/<%= classInfo._id %>" method="post">
+        <label for="description">Task Description:</label>
+        <textarea id="description" name="description" required></textarea>
+        <button type="submit">Add Task</button>
     </form>
 </body>
 </html>

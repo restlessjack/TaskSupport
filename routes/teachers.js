@@ -2,6 +2,35 @@ const express = require('express');
 const router = express.Router();
 const Class = require('../models/class');
 const User = require('../models/user');
+const Task = require('../models/task'); // Assuming you have this model from previous discussions
+
+// Assuming you have a route or function to create a task
+router.post('/create-task/:classId', verifyTeacher, async (req, res) => {
+    const { description } = req.body;
+    const classId = req.params.classId;
+
+    try {
+        // Fetch all students in the class
+        const classInfo = await Class.findById(classId);
+        const completions = classInfo.students.map(studentId => ({
+            student: studentId,
+            completed: false // All marked as incomplete initially
+        }));
+
+        // Create a new task with completions pre-populated
+        const newTask = new Task({
+            description,
+            class: classId,
+            completions: completions
+        });
+        await newTask.save();
+        const classes = await Class.find({ teacher: req.session.userId }).populate('students', 'username');
+        res.render('view-classes', { classes });
+    } catch (error) {
+        console.error('Error creating task:', error);
+        res.status(500).send('Failed to create task');
+    }
+});
 
 // Middleware to verify if the user is a teacher
 function verifyTeacher(req, res, next) {
