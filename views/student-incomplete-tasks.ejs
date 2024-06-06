@@ -7,13 +7,19 @@
 </head>
 <body>
     <h1>Your Incomplete Tasks</h1>
-    <ul>
-        <% tasks.forEach(task => { %>
-            <li>
-                <strong>Description:</strong> <%= task.description %><br>
-                <strong>Due Date:</strong> <%= new Date(task.date).toLocaleDateString() %><br>
-            </li>
-        <% }); %>
-    </ul>
+    <form action="/mark-tasks-complete" method="post">
+        <ul>
+            <% tasks.forEach(task => { %>
+                <li>
+                    <strong>Description:</strong> <%= task.description %><br>
+                    <strong>Due Date:</strong> <%= new Date(task.date).toLocaleDateString() %><br>
+                    <label>
+                        <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
+                    </label>
+                </li>
+            <% }); %>
+        </ul>
+        <button type="submit">Submit Changes</button>
+    </form>
 </body>
 </html>

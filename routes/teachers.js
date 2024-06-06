@@ -36,7 +36,7 @@ router.post('/create-task/:classId', verifyTeacher, async (req, res) => {
             $push: { tasks: savedTask._id }
         });
 
-        res.redirect('classes/view-class' + classId);
+        res.redirect('classes/view-class/' + classId);
     } catch (error) {
         console.error('Error creating task:', error);
         res.status(500).send('Failed to create task');

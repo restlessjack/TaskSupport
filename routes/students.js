@@ -185,6 +185,75 @@ router.get('/student-incomplete-tasks', verifyStudent, async (req, res) => {
     }
 });
 
+router.post('/mark-tasks-complete', verifyStudent, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        const { completedTasks } = req.body;
+
+        if (!completedTasks) {
+            return res.redirect('/student-incomplete-tasks');
+        }
+
+        const taskIds = Array.isArray(completedTasks) ? completedTasks : [completedTasks];
+
+        await Promise.all(taskIds.map(async taskId => {
+            await Task.updateOne(
+                { _id: taskId, "completions.student": userId },
+                { $set: { "completions.$.completed": true } }
+            );
+        }));
+
+        res.redirect('/student-incomplete-tasks');
+    } catch (error) {
+        console.error('Error marking tasks as complete:', error);
+        res.status(500).send('Failed to mark tasks as complete');
+    }
+});
+
+
+router.get('/student-new-tasks', verifyStudent, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+
+        // Fetch new tasks for the student
+        const tasks = await Task.find({
+            "completions.student": userId,
+            "completions.completed": false,
+            "completions.new": true
+        }).populate('class', 'name');
+
+        res.json({ tasks: tasks });
+    } catch (error) {
+        console.error('Error retrieving new tasks:', error);
+        res.status(500).send('Failed to retrieve new tasks');
+    }
+});
+
+router.get('/student-new-tasks-page', verifyStudent, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+
+        // Fetch new tasks for the student
+        const tasks = await Task.find({
+            "completions.student": userId,
+            "completions.completed": false,
+            "completions.new": true
+        }).populate('class', 'name');
+
+        await Task.updateMany(
+            { "completions.student": userId, "completions.completed": false, "completions.new": true },
+            { $set: { "completions.$[elem].new": false } },
+            { arrayFilters: [{ "elem.student": userId }] }
+        );
+
+        res.render('student-new-tasks', { tasks: tasks });
+    } catch (error) {
+        console.error('Error retrieving new tasks:', error);
+        res.status(500).send('Failed to retrieve new tasks');
+    }
+});
+
+
 
 
 
