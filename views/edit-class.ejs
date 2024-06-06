@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Class</title>
+    <style>
+        label, input, button {
+            display: block;
+            margin-top: 10px;
+        }
+        input, button {
+            margin-bottom: 10px;
+        }
+        .student-entry {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Edit Class: <%= classInfo.name %></h1>
+    <form id="classForm" method="post" action="/teachers/edit-class/<%= classInfo._id %>">
+        <label for="name">Class Name:</label>
+        <input type="text" id="name" name="name" value="<%= classInfo.name %>" required>
+        
+        <label>Students (by username):</label>
+        <div id="studentList">
+            <% classInfo.students.forEach(function(student) { %>
+                <div class="student-entry">
+                    <input type="text" name="students[]" value="<%= student.username %>" required>
+                    <button type="button" onclick="removeStudent(this)">Remove</button>
+                </div>
+            <% }); %>
+        </div>
+        <button type="button" onclick="addStudent()">Add Student</button>
+        
+        <button type="submit">Update Class</button>
+    </form>
+    <button onclick="window.location.href='/teachers/view-classes'">Cancel</button>
+
+    <script>
+        function addStudent() {
+            const studentList = document.getElementById('studentList');
+            const inputDiv = document.createElement('div');
+            inputDiv.className = 'student-entry';
+            inputDiv.innerHTML = `
+                <input type="text" name="students[]" required>
+                <button type="button" onclick="removeStudent(this)">Remove</button>
+            `;
+            studentList.appendChild(inputDiv);
+        }
+
+        function removeStudent(button) {
+            button.parentNode.remove();
+        }
+    </script>
+</body>
+</html>

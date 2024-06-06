@@ -29,11 +29,11 @@
         <% classes.forEach(function(cls) { %>
             <li>
                 <a href="/teachers/view-class/<%= cls._id %>"><%= cls.name %></a> <!-- Link to view class details and tasks -->
-                <a href="/teachers/edit/<%= cls._id %>" style="margin-left: 20px;">Edit</a> <!-- Link to edit class -->
+                <a href="/teachers/edit-class/<%= cls._id %>" style="margin-left: 20px;">Edit</a>
             </li>
         <% }) %>
     </ul>
     <button onclick="location.href='/teachers/create'">Add New Class</button> <!-- Button to add a new class -->
-    <button onclick="location.href='/teachers/teacher-dashboard'">Back</button>
+    <button onclick="location.href='/teachers/dashboard'">Back</button>
 </body>
 </html>
