@@ -3,10 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class Attendance Details</title>
+    <title>Class Details</title>
 </head>
 <body>
     <h1>Class: <%= className %></h1>
     <h2>Attendance Percentage: <%= totalAttendancePercentage %> %</h2>
+    <h2>Tasks:</h2>
+    <ul>
+        <% tasks.forEach(function(task) { %>
+            <li>
+                <%= task.description %> - Due: <%= new Date(task.date).toISOString().slice(0, 10) %>
+                <% if (task.completions.find(c => c.student.toString() === userId.toString()).completed) { %>
+                    <strong>Completed</strong>
+                <% } else { %>
+                    <strong>Incomplete</strong>
+                <% } %>
+            </li>
+        <% }); %>
+    </ul>
 </body>
 </html>

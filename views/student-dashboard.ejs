@@ -2,14 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Teacher Dashboard</title>
+    <title>Student Dashboard</title>
 </head>
 <body>
     <h1>Welcome <%= username %></h1> <!-- Display the username -->
     <nav>
         <ul>
             <li><a>Total Attendace: <%= totalAttendancePercentage %></a></li>
+            <li><a>Total Tasks Completed: <%= totalTaskCompletionPercentage %></a></li>
             <li><a href="/students/student-classes">View Classes</a></li>
+            <li><a href="/students/student-incomplete-tasks">View Incomplete Tasks</a></li>
             <li><a href="/users/logout">Logout</a></li>
         </ul>
     </nav>

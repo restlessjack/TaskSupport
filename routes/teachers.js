@@ -10,8 +10,12 @@ router.post('/create-task/:classId', verifyTeacher, async (req, res) => {
     const classId = req.params.classId;
 
     try {
-        // Fetch all students in the class
         const classInfo = await Class.findById(classId);
+        if (!classInfo) {
+            console.error('Class not found with ID:', classId);
+            return res.status(404).send('Class not found');
+        }
+
         const completions = classInfo.students.map(studentId => ({
             student: studentId,
             completed: false // All marked as incomplete initially
@@ -23,14 +27,22 @@ router.post('/create-task/:classId', verifyTeacher, async (req, res) => {
             class: classId,
             completions: completions
         });
-        await newTask.save();
-        const classes = await Class.find({ teacher: req.session.userId }).populate('students', 'username');
-        res.render('view-classes', { classes });
+
+        // Make sure to assign the result of the save operation to a variable
+        const savedTask = await newTask.save();
+
+        // Update the class document to include the new task
+        await Class.findByIdAndUpdate(classId, {
+            $push: { tasks: savedTask._id }
+        });
+
+        res.redirect('classes/view-class' + classId);
     } catch (error) {
         console.error('Error creating task:', error);
         res.status(500).send('Failed to create task');
     }
 });
+
 
 // Middleware to verify if the user is a teacher
 function verifyTeacher(req, res, next) {
