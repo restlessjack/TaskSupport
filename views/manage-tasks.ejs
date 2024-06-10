@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Class Details</title>
+    <title>Manage Tasks for <%= classInfo.name %></title>
     <style>
         ul {
             list-style-type: none;
@@ -43,32 +43,31 @@
     </style>
 </head>
 <body>
-    <h1>Class: <%= classInfo.name %></h1>
-    <h2>Total Attendance Percentage: <%= totalAttendancePercentage.toFixed(2) %> %</h2>
-    <h2>Student List:</h2>
+    <h1>Manage Tasks for <%= classInfo.name %></h1>
+
+    <h2>Existing Tasks</h2>
     <ul>
-        <% if (studentAttendancePercentages && studentAttendancePercentages.length > 0) { %>
-            <% studentAttendancePercentages.forEach(function(student) { %>
-                <li><%= student.username %> - Attendance: <%= student.attendancePercentage.toFixed(2) %> %</li>
+        <% if (classInfo.tasks && classInfo.tasks.length > 0) { %>
+            <% classInfo.tasks.forEach(function(task) { %>
+                <li>
+                    <%= task.description %>
+                    <form action="/teachers/delete-task/<%= task._id %>" method="post" style="display:inline;">
+                        <input type="hidden" name="classId" value="<%= classInfo._id %>">
+                        <button type="submit">Delete</button>
+                    </form>
+                    <form action="/teachers/edit-task/<%= task._id %>" method="get" style="display:inline;">
+                        <input type="hidden" name="classId" value="<%= classInfo._id %>">
+                        <button type="submit">Edit</button>
+                    </form>
+                </li>
             <% }) %>
         <% } else { %>
-            <li>No students assigned</li>
+            <li>No tasks assigned</li>
         <% } %>
     </ul>
-    <ul>
-    <form action="/attendances/attendance/<%= classInfo._id %>" method="get">
-        <button type="submit">Create Attendance Report</button>
-    </form>
-    </ul>
-    <!-- Form to add a new task -->
-    <form action="/teachers/create-task/<%= classInfo._id %>" method="post">
-        <label for="description">Task Description:</label>
-        <textarea id="description" name="description" required></textarea>
-        <button type="submit">Add Task</button>
-    </form>
-    <form action="/teachers/manage-tasks/<%= classInfo._id %>" method="get">
-        <button type="submit">Manage Tasks</button>
-    </form>
+
+    
+
     <button onclick="history.back()">Back to Classes</button>
 </body>
 </html>

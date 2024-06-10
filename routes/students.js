@@ -191,7 +191,7 @@ router.post('/mark-tasks-complete', verifyStudent, async (req, res) => {
         const { completedTasks } = req.body;
 
         if (!completedTasks) {
-            return res.redirect('/student-incomplete-tasks');
+            return res.redirect('student/student-incomplete-tasks');
         }
 
         const taskIds = Array.isArray(completedTasks) ? completedTasks : [completedTasks];
@@ -203,7 +203,7 @@ router.post('/mark-tasks-complete', verifyStudent, async (req, res) => {
             );
         }));
 
-        res.redirect('/student-incomplete-tasks');
+        res.redirect('students/student-incomplete-tasks');
     } catch (error) {
         console.error('Error marking tasks as complete:', error);
         res.status(500).send('Failed to mark tasks as complete');

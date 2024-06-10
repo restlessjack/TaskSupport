@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Task</title>
+    <style>
+        input, textarea {
+            width: 95%;
+            padding: 12px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            cursor: pointer;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Edit Task</h1>
+    <form action="/teachers/edit-task/<%= task._id %>" method="post">
+        <label for="description">Task Description:</label>
+        <textarea id="description" name="description" required><%= task.description %></textarea>
+        <input type="hidden" name="classId" value="<%= task.class %>">
+        <button type="submit">Update Task</button>
+    </form>
+    <button onclick="history.back()">Back to Task Management</button>
+</body>
+</html>

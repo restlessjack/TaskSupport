@@ -247,4 +247,58 @@ router.get('/view-class/:id', verifyTeacher, async (req, res) => {
     }
 });
 
+router.get('/manage-tasks/:classId', verifyTeacher, async (req, res) => {
+    try {
+        const classId = req.params.classId;
+        const classInfo = await Class.findById(classId).populate('tasks').exec();
+
+        if (!classInfo) {
+            return res.status(404).send('Class not found');
+        }
+
+        res.render('manage-tasks', { classInfo });
+    } catch (error) {
+        console.error('Error retrieving tasks:', error);
+        res.status(500).render('error', { message: 'Failed to load tasks' });
+    }
+});
+
+// Route to edit a task form
+router.get('/edit-task/:taskId', verifyTeacher, async (req, res) => {
+    try {
+        const task = await Task.findById(req.params.taskId);
+
+        if (!task) {
+            return res.status(404).send('Task not found');
+        }
+
+        res.render('edit-task', { task });
+    } catch (error) {
+        res.status(500).send('Error loading edit form');
+    }
+});
+
+// Route to update a task
+router.post('/edit-task/:taskId', verifyTeacher, async (req, res) => {
+    const { description } = req.body;
+    try {
+        await Task.findByIdAndUpdate(req.params.taskId, { description });
+        res.redirect('/teachers/manage-tasks/' + req.body.classId);
+    } catch (error) {
+        res.status(500).send('Error updating task');
+    }
+});
+
+// Route to delete a task
+router.post('/delete-task/:taskId', verifyTeacher, async (req, res) => {
+    try {
+        const taskId = req.params.taskId;
+        await Task.findByIdAndDelete(taskId);
+        res.redirect('/teachers/manage-tasks/' + req.body.classId);
+    } catch (error) {
+        res.status(500).send('Error deleting task');
+    }
+});
+
+
 module.exports = router;

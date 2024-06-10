@@ -48,7 +48,7 @@ router.post('/login', async (req, res) => {
 
         // Redirect based on role
         if (user.role === 'teacher') {
-            res.redirect('/teachers/teacher-dashboard');
+            res.redirect('/teachers/dashboard');
         } else if (user.role === 'student') {
             res.redirect('/students/student-dashboard');
         }
