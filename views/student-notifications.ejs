@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+    <style>
+        .notification {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .unread {
+            background-color: #f9f9f9;
+        }
+        .read {
+            background-color: #e9e9e9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Notifications</h1>
+    <% notifications.forEach(function(notification) { %>
+        <div class="notification <%= notification.read ? 'read' : 'unread' %>">
+            <p><strong>Type:</strong> <%= notification.type %></p>
+            <p><strong>Message:</strong> <%= notification.message %></p>
+            <p><strong>Date:</strong> <%= notification.date.toLocaleString() %></p>
+        </div>
+    <% }) %>
+    <button onclick="history.back()">Back</button>
+</body>
+</html>

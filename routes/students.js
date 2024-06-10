@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const Class = require('../models/class');
+const Notification = require('../models/notification')
 const Attendance = require('../models/attendance');
 const Task = require('../models/task');  
 const mongoose = require('mongoose');
@@ -13,7 +14,81 @@ function verifyStudent(req, res, next) {
     next();
 }
 
-router.get('/student-dashboard', verifyStudent, async (req, res) => {
+async function calculateClassAttendance(classId, userId) {
+    const attendanceDocs = await Attendance.find({ class: classId }).select('records.student records.status');
+
+    // Flatten the records into a single array of { student, status }
+    const allAttendanceRecords = attendanceDocs.flatMap(doc => doc.records.map(record => ({
+        student: record.student,
+        status: record.status
+    })));
+
+    // Calculate the total attendance percentage
+    const totalAttendancePercentage = calculatePercent(allAttendanceRecords);
+
+    let studentAttendancePercentage = 0;
+    if (userId) {
+        const studentRecords = allAttendanceRecords.filter(record =>
+            record.student.toString() === userId.toString());
+        studentAttendancePercentage = calculatePercent(studentRecords);
+    }
+
+    return {
+        totalAttendancePercentage,
+        studentAttendancePercentage
+    };
+}
+
+
+function calculatePercent(records) {
+    if (records.length === 0) return 0;
+
+    const totalSessions = records.length;
+    const totalPresent = records.filter(record => record.status === 'Present').length;
+
+    return (totalPresent / totalSessions) * 100;
+}
+
+
+
+async function generateAttendanceNotifications(req, res, next) {
+    try {
+        const userId = req.session.userId;
+        const classes = await Class.find({ students: userId });
+
+        await Promise.all(classes.map(async classInfo => {
+            const { studentAttendancePercentage } = await calculateClassAttendance(classInfo._id, userId);
+
+            if (studentAttendancePercentage < 75) { // Assuming 75% as the threshold
+                const existingNotification = await Notification.findOne({
+                    user: userId,
+                    type: 'Low Attendance',
+                    class: classInfo._id,
+                    read: false
+                });
+
+                if (!existingNotification) {
+                    const notification = new Notification({
+                        user: userId,
+                        type: 'Low Attendance',
+                        class: classInfo._id,
+                        message: `Your attendance in ${classInfo.name} is below 75%. Current attendance: ${studentAttendancePercentage.toFixed(2)}%.`,
+                        read: false
+                    });
+                    await notification.save();
+                }
+            }
+        }));
+
+        next();
+    } catch (error) {
+        console.error('Error generating notifications:', error);
+        res.status(500).send('Failed to generate notifications');
+    }
+}
+
+
+router.get('/student-dashboard', verifyStudent, generateAttendanceNotifications, async (req, res) => {
     try {
         const userId = new mongoose.Types.ObjectId(req.session.userId); // Convert session userId to ObjectId
         
@@ -107,54 +182,22 @@ router.get('/student-classes', verifyStudent, async (req, res) => {
     }
 });
 
+
 router.get('/student-class-details/:classId', verifyStudent, async (req, res) => {
     try {
         const classId = new mongoose.Types.ObjectId(req.params.classId);
-        const userId = req.session.userId; 
+        const userId = req.session.userId;
 
         const classInfo = await Class.findById(classId).populate('tasks');
         const tasks = classInfo.tasks || [];
 
-        console.log("Class Info:", JSON.stringify(classInfo, null, 2));  // Log full class info including tasks
-        console.log("Tasks Found:", classInfo.tasks);  // Log the tasks separately
-        console.log("UserID:", userId);  // Log full class info including tasks
-
-        // Calculate the attendance percentage for the specific class
-        const results = await Attendance.aggregate([
-            { $match: { class: classId, "records.student": userId } },
-            { $unwind: "$records" },
-            { $match: { "records.student": userId } },
-            {
-                $group: {
-                    _id: null,
-                    totalSessions: { $sum: 1 },
-                    totalPresent: {
-                        $sum: {
-                            $cond: [{ $eq: ["$records.status", "Present"] }, 1, 0]
-                        }
-                    }
-                }
-            },
-            {
-                $project: {
-                    _id: 0,
-                    totalAttendancePercentage: {
-                        $cond: [
-                            { $eq: ["$totalSessions", 0] },
-                            0,
-                            { $multiply: [{ $divide: ["$totalPresent", "$totalSessions"] }, 100] }
-                        ]
-                    }
-                }
-            }
-        ]);
-
-        const totalAttendancePercentage = results.length > 0 ? results[0].totalAttendancePercentage : 0;
+        const { totalAttendancePercentage, studentAttendancePercentage } = await calculateClassAttendance(classId, userId);
 
         res.render('student-class-details', {
             className: classInfo.name,
             totalAttendancePercentage: totalAttendancePercentage.toFixed(2),
-            tasks: tasks,  // Pass the tasks to the EJS template,
+            studentAttendancePercentage: studentAttendancePercentage.toFixed(2),
+            tasks: tasks,
             userId: userId
         });
     } catch (error) {
@@ -162,7 +205,6 @@ router.get('/student-class-details/:classId', verifyStudent, async (req, res) =>
         res.status(500).send('Failed to retrieve class and task details');
     }
 });
-
 router.get('/student-incomplete-tasks', verifyStudent, async (req, res) => {
     try {
         const userId = req.session.userId; // Assuming the student's userId is stored in the session
@@ -253,6 +295,19 @@ router.get('/student-new-tasks-page', verifyStudent, async (req, res) => {
     }
 });
 
+
+// View notifications for a student
+router.get('/student-notifications', verifyStudent, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        const notifications = await Notification.find({ user: userId });
+
+        res.render('student-notifications', { notifications });
+    } catch (error) {
+        console.error('Error retrieving notifications:', error);
+        res.status(500).send('Failed to retrieve notifications');
+    }
+});
 
 
 
