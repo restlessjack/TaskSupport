@@ -4,22 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Incomplete Tasks</title>
+    <style>
+        .new-task {
+            border: 2px solid red;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .task {
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
 </head>
 <body>
     <h1>Your Incomplete Tasks</h1>
     <form action="/students/mark-tasks-complete" method="post">
+        <h2>New Tasks</h2>
         <ul>
             <% tasks.forEach(task => { %>
-                <li>
-                    <strong>Description:</strong> <%= task.description %><br>
-                    <strong>Due Date:</strong> <%= new Date(task.date).toLocaleDateString() %><br>
-                    <label>
-                        <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
-                    </label>
-                </li>
+                <% if (task.completions.find(c => c.student.toString() === userId.toString()).new) { %>
+                    <li class="new-task">
+                        <strong>Description:</strong> <%= task.description %><br>
+                        <strong>Due Date:</strong> <%= new Date(task.date).toLocaleDateString() %><br>
+                        <label>
+                            <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
+                        </label>
+                    </li>
+                <% } %>
+            <% }); %>
+        </ul>
+        <h2>Other Incomplete Tasks</h2>
+        <ul>
+            <% tasks.forEach(task => { %>
+                <% if (!task.completions.find(c => c.student.toString() === userId.toString()).new) { %>
+                    <li class="task">
+                        <strong>Description:</strong> <%= task.description %><br>
+                        <strong>Due Date:</strong> <%= new Date(task.date).toLocaleDateString() %><br>
+                        <label>
+                            <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
+                        </label>
+                    </li>
+                <% } %>
             <% }); %>
         </ul>
         <button type="submit">Submit Changes</button>
     </form>
+    <button onclick="window.location.href='/students/student-dashboard'">Back to Dashboard</button>
+
 </body>
 </html>

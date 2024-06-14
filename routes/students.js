@@ -1,10 +1,9 @@
-
 const express = require('express');
 const router = express.Router();
 const Class = require('../models/class');
-const Notification = require('../models/notification')
+const Notification = require('../models/notification');
 const Attendance = require('../models/attendance');
-const Task = require('../models/task');  
+const Task = require('../models/task');
 const mongoose = require('mongoose');
 
 function verifyStudent(req, res, next) {
@@ -39,7 +38,6 @@ async function calculateClassAttendance(classId, userId) {
     };
 }
 
-
 function calculatePercent(records) {
     if (records.length === 0) return 0;
 
@@ -48,8 +46,6 @@ function calculatePercent(records) {
 
     return (totalPresent / totalSessions) * 100;
 }
-
-
 
 async function generateAttendanceNotifications(req, res, next) {
     try {
@@ -87,11 +83,9 @@ async function generateAttendanceNotifications(req, res, next) {
     }
 }
 
-
 router.get('/student-dashboard', verifyStudent, generateAttendanceNotifications, async (req, res) => {
     try {
         const userId = new mongoose.Types.ObjectId(req.session.userId); // Convert session userId to ObjectId
-        
 
         // Calculate total attendance percentage using MongoDB aggregation
         const results = await Attendance.aggregate([
@@ -154,10 +148,8 @@ router.get('/student-dashboard', verifyStudent, generateAttendanceNotifications,
 
         const totalTaskCompletionPercentage = taskResults.length > 0 ? taskResults[0].totalTaskCompletionPercentage : 0;
 
-
         res.render('student-dashboard', {
             username: req.session.username,
-            
             totalAttendancePercentage: totalAttendancePercentage.toFixed(2),
             totalTaskCompletionPercentage: totalTaskCompletionPercentage.toFixed(2) // Formatting to 2 decimal places
         });
@@ -182,7 +174,6 @@ router.get('/student-classes', verifyStudent, async (req, res) => {
     }
 });
 
-
 router.get('/student-class-details/:classId', verifyStudent, async (req, res) => {
     try {
         const classId = new mongoose.Types.ObjectId(req.params.classId);
@@ -205,9 +196,10 @@ router.get('/student-class-details/:classId', verifyStudent, async (req, res) =>
         res.status(500).send('Failed to retrieve class and task details');
     }
 });
+
 router.get('/student-incomplete-tasks', verifyStudent, async (req, res) => {
     try {
-        const userId = req.session.userId; // Assuming the student's userId is stored in the session
+        const userId = req.session.userId;
 
         // Fetch tasks where the student's completions are marked as false
         const tasks = await Task.find({
@@ -219,7 +211,8 @@ router.get('/student-incomplete-tasks', verifyStudent, async (req, res) => {
         });
 
         res.render('student-incomplete-tasks', {
-            tasks: tasks
+            tasks: tasks,
+            userId: userId
         });
     } catch (error) {
         console.error('Error retrieving incomplete tasks:', error);
@@ -233,7 +226,7 @@ router.post('/mark-tasks-complete', verifyStudent, async (req, res) => {
         const { completedTasks } = req.body;
 
         if (!completedTasks) {
-            return res.redirect('student/student-incomplete-tasks');
+            return res.redirect('/students/student-incomplete-tasks');
         }
 
         const taskIds = Array.isArray(completedTasks) ? completedTasks : [completedTasks];
@@ -241,17 +234,16 @@ router.post('/mark-tasks-complete', verifyStudent, async (req, res) => {
         await Promise.all(taskIds.map(async taskId => {
             await Task.updateOne(
                 { _id: taskId, "completions.student": userId },
-                { $set: { "completions.$.completed": true } }
+                { $set: { "completions.$.completed": true, "completions.$.new": false } }
             );
         }));
 
-        res.redirect('students/student-incomplete-tasks');
+        return res.redirect('/students/student-incomplete-tasks');
     } catch (error) {
         console.error('Error marking tasks as complete:', error);
         res.status(500).send('Failed to mark tasks as complete');
     }
 });
-
 
 router.get('/student-new-tasks', verifyStudent, async (req, res) => {
     try {
@@ -271,31 +263,6 @@ router.get('/student-new-tasks', verifyStudent, async (req, res) => {
     }
 });
 
-router.get('/student-new-tasks-page', verifyStudent, async (req, res) => {
-    try {
-        const userId = req.session.userId;
-
-        // Fetch new tasks for the student
-        const tasks = await Task.find({
-            "completions.student": userId,
-            "completions.completed": false,
-            "completions.new": true
-        }).populate('class', 'name');
-
-        await Task.updateMany(
-            { "completions.student": userId, "completions.completed": false, "completions.new": true },
-            { $set: { "completions.$[elem].new": false } },
-            { arrayFilters: [{ "elem.student": userId }] }
-        );
-
-        res.render('student-new-tasks', { tasks: tasks });
-    } catch (error) {
-        console.error('Error retrieving new tasks:', error);
-        res.status(500).send('Failed to retrieve new tasks');
-    }
-});
-
-
 // View notifications for a student
 router.get('/student-notifications', verifyStudent, async (req, res) => {
     try {
@@ -308,8 +275,5 @@ router.get('/student-notifications', verifyStudent, async (req, res) => {
         res.status(500).send('Failed to retrieve notifications');
     }
 });
-
-
-
 
 module.exports = router;

@@ -5,19 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
     <style>
-        .new-tasks-button {
-            background-color: red;
-            color: white;
-            padding: 10px;
-            border: none;
-            cursor: pointer;
-        }
-        .no-new-tasks-button {
-            background-color: grey;
-            color: white;
-            padding: 10px;
-            border: none;
-            cursor: pointer;
+        .new-tasks-notification {
+            color: red;
+            font-weight: bold;
         }
     </style>
     <script>
@@ -25,14 +15,12 @@
             try {
                 const response = await fetch('/students/student-new-tasks');
                 const data = await response.json();
-                const newTasksButton = document.getElementById('new-tasks-button');
+                const newTasksNotification = document.getElementById('new-tasks-notification');
 
                 if (data.tasks.length > 0) {
-                    newTasksButton.className = 'new-tasks-button';
-                    newTasksButton.innerText = 'New Tasks Available';
+                    newTasksNotification.innerText = ' (New Tasks Available)';
                 } else {
-                    newTasksButton.className = 'no-new-tasks-button';
-                    newTasksButton.innerText = 'No New Tasks';
+                    newTasksNotification.innerText = '';
                 }
             } catch (error) {
                 console.error('Error checking new tasks:', error);
@@ -48,14 +36,16 @@
     <h1>Welcome <%= username %></h1>
     <nav>
         <ul>
-            <li><a>Total Attendance: <%= totalAttendancePercentage %></a></li>
-            <li><a>Total Tasks Completed: <%= totalTaskCompletionPercentage %></a></li>
+            <li>Total Attendance: <%= totalAttendancePercentage %></li>
+            <li>Total Tasks Completed: <%= totalTaskCompletionPercentage %></li>
             <li><a href="/students/student-classes">View Classes</a></li>
-            <li><a href="/students/student-incomplete-tasks">View Incomplete Tasks</a></li>
+            <li>
+                <a href="/students/student-incomplete-tasks">View Incomplete Tasks</a>
+                <span id="new-tasks-notification"></span>
+            </li>
             <li><a href="/students/student-notifications">View Notifications</a></li>
             <li><a href="/users/logout">Logout</a></li>
         </ul>
     </nav>
-    <button id="new-tasks-button" onclick="window.location.href='/students/student-new-tasks-page'">Check for New Tasks</button>
 </body>
 </html>
