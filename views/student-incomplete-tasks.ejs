@@ -19,37 +19,46 @@
 <body>
     <h1>Your Incomplete Tasks</h1>
     <form action="/students/mark-tasks-complete" method="post">
-        <h2>New Tasks</h2>
-        <ul>
-            <% tasks.forEach(task => { %>
-                <% if (task.completions.find(c => c.student.toString() === userId.toString()).new) { %>
+        <% if (newTasks && newTasks.length > 0) { %>
+            <h2>New Tasks</h2>
+            <ul>
+                <% newTasks.forEach(task => { %>
                     <li class="new-task">
                         <strong>Description:</strong> <%= task.description %><br>
-                        <strong>Due Date:</strong> <%= new Date(task.date).toLocaleDateString() %><br>
+                        <% if (task.optionalDueDate) { %>
+                            <strong>Due Date:</strong> <%= new Date(task.optionalDueDate).toLocaleDateString() %><br>
+                        <% } %>
+                        <strong>Class:</strong> <%= task.class.name %><br>
+                        <strong>Importance:</strong> <%= task.importance %><br>
                         <label>
                             <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
                         </label>
                     </li>
-                <% } %>
-            <% }); %>
-        </ul>
-        <h2>Other Incomplete Tasks</h2>
-        <ul>
-            <% tasks.forEach(task => { %>
-                <% if (!task.completions.find(c => c.student.toString() === userId.toString()).new) { %>
+                <% }) %>
+            </ul>
+        <% } %>
+
+        <% if (otherTasks && otherTasks.length > 0) { %>
+            <h2>Other Incomplete Tasks</h2>
+            <ul>
+                <% otherTasks.forEach(task => { %>
                     <li class="task">
                         <strong>Description:</strong> <%= task.description %><br>
-                        <strong>Due Date:</strong> <%= new Date(task.date).toLocaleDateString() %><br>
+                        <% if (task.optionalDueDate) { %>
+                            <strong>Due Date:</strong> <%= new Date(task.optionalDueDate).toLocaleDateString() %><br>
+                        <% } %>
+                        <strong>Class:</strong> <%= task.class.name %><br>
+                        <strong>Importance:</strong> <%= task.importance %><br>
                         <label>
                             <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
                         </label>
                     </li>
-                <% } %>
-            <% }); %>
-        </ul>
+                <% }) %>
+            </ul>
+        <% } %>
+
         <button type="submit">Submit Changes</button>
     </form>
     <button onclick="window.location.href='/students/student-dashboard'">Back to Dashboard</button>
-
 </body>
 </html>

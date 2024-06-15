@@ -5,6 +5,7 @@ const Notification = require('../models/notification');
 const Attendance = require('../models/attendance');
 const Task = require('../models/task');
 const mongoose = require('mongoose');
+const UserSettings = require('../models/userSettings');
 
 function verifyStudent(req, res, next) {
     if (!req.session.userId || req.session.userRole !== 'student') {
@@ -52,10 +53,12 @@ async function generateAttendanceNotifications(req, res, next) {
         const userId = req.session.userId;
         const classes = await Class.find({ students: userId });
 
+        const settings = await UserSettings.findOne({ user: userId });
+
         await Promise.all(classes.map(async classInfo => {
             const { studentAttendancePercentage } = await calculateClassAttendance(classInfo._id, userId);
 
-            if (studentAttendancePercentage < 75) { // Assuming 75% as the threshold
+            if (studentAttendancePercentage < settings.attendanceThreshold) { // Use user-defined threshold
                 const existingNotification = await Notification.findOne({
                     user: userId,
                     type: 'Low Attendance',
@@ -68,7 +71,7 @@ async function generateAttendanceNotifications(req, res, next) {
                         user: userId,
                         type: 'Low Attendance',
                         class: classInfo._id,
-                        message: `Your attendance in ${classInfo.name} is below 75%. Current attendance: ${studentAttendancePercentage.toFixed(2)}%.`,
+                        message: `Your attendance in ${classInfo.name} is below ${settings.attendanceThreshold}%. Current attendance: ${studentAttendancePercentage.toFixed(2)}%.`,
                         read: false
                     });
                     await notification.save();
@@ -82,6 +85,50 @@ async function generateAttendanceNotifications(req, res, next) {
         res.status(500).send('Failed to generate notifications');
     }
 }
+
+async function generateDueDateNotifications() {
+    try {
+        const tasks = await Task.find({ "completions.completed": false });
+
+        for (const task of tasks) {
+            const classInfo = await Class.findById(task.class);
+            for (const completion of task.completions) {
+                const settings = await UserSettings.findOne({ user: completion.student });
+
+                if (settings && task.optionalDueDate) {
+                    const dueDate = new Date(task.optionalDueDate);
+                    const notificationDate = new Date(dueDate);
+                    notificationDate.setDate(dueDate.getDate() - settings.dueDateNotificationDays);
+
+                    if (notificationDate <= new Date() && !completion.new) {
+                        const existingNotification = await Notification.findOne({
+                            user: completion.student,
+                            type: 'Due Date',
+                            task: task._id,
+                            read: false
+                        });
+
+                        if (!existingNotification) {
+                            const notification = new Notification({
+                                user: completion.student,
+                                type: 'Due Date',
+                                task: task._id,
+                                message: `The task "${task.description}" in ${classInfo.name} is due on ${dueDate.toLocaleDateString()}.`,
+                                read: false
+                            });
+                            await notification.save();
+                        }
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error generating due date notifications:', error);
+    }
+}
+
+// Call this function periodically, e.g., once a day using a cron job or similar scheduler
+setInterval(generateDueDateNotifications, 24 * 60 * 60 * 1000); // Once a day
 
 router.get('/student-dashboard', verifyStudent, generateAttendanceNotifications, async (req, res) => {
     try {
@@ -206,12 +253,40 @@ router.get('/student-incomplete-tasks', verifyStudent, async (req, res) => {
             "completions.student": userId,
             "completions.completed": false
         }).populate({
-            path: 'completions',
-            match: { student: userId, completed: false }
+            path: 'class',
+            select: 'name' // Only fetch the class name
         });
 
+        console.log("Fetching tasks for user:", userId);
+        console.log("Fetched tasks:", tasks);
+
+        // Mark new tasks as read
+        const result = await Task.updateMany(
+            { "completions.student": userId, "completions.completed": false, "completions.new": true },
+            { $set: { "completions.$[elem].new": false } },
+            { arrayFilters: [{ "elem.student": userId }] }
+        );
+
+        console.log("Marked new tasks as read:", result);
+
+        const newTasks = tasks.filter(task => 
+            task.completions.some(completion => 
+                completion.student && completion.student.toString() === userId.toString() && completion.new
+            )
+        );
+        
+        const otherTasks = tasks.filter(task => 
+            !task.completions.some(completion => 
+                completion.student && completion.student.toString() === userId.toString() && completion.new
+            )
+        );
+
+        console.log("New tasks:", newTasks);
+        console.log("Other incomplete tasks:", otherTasks);
+
         res.render('student-incomplete-tasks', {
-            tasks: tasks,
+            newTasks: newTasks,
+            otherTasks: otherTasks,
             userId: userId
         });
     } catch (error) {
@@ -219,6 +294,14 @@ router.get('/student-incomplete-tasks', verifyStudent, async (req, res) => {
         res.status(500).send('Failed to retrieve incomplete tasks');
     }
 });
+
+
+
+
+
+
+
+
 
 router.post('/mark-tasks-complete', verifyStudent, async (req, res) => {
     try {
@@ -273,6 +356,44 @@ router.get('/student-notifications', verifyStudent, async (req, res) => {
     } catch (error) {
         console.error('Error retrieving notifications:', error);
         res.status(500).send('Failed to retrieve notifications');
+    }
+});
+
+// Display settings page
+router.get('/settings', verifyStudent, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        let settings = await UserSettings.findOne({ user: userId });
+
+        // If settings do not exist for the user, create default settings
+        if (!settings) {
+            settings = new UserSettings({ user: userId });
+            await settings.save();
+        }
+
+        res.render('student-settings', { settings });
+    } catch (error) {
+        console.error('Error loading settings:', error);
+        res.status(500).send('Failed to load settings');
+    }
+});
+
+// Update settings
+router.post('/settings', verifyStudent, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        const { attendanceThreshold, dueDateNotificationDays } = req.body;
+
+        await UserSettings.findOneAndUpdate(
+            { user: userId },
+            { attendanceThreshold, dueDateNotificationDays },
+            { upsert: true, new: true }
+        );
+
+        res.redirect('/students/settings');
+    } catch (error) {
+        console.error('Error updating settings:', error);
+        res.status(500).send('Failed to update settings');
     }
 });
 

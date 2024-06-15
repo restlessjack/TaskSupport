@@ -162,33 +162,31 @@ router.post('/delete-class/:id', verifyTeacher, async (req, res) => {
     }
 });
 
-// Create a new task for a class
 router.post('/create-task/:classId', verifyTeacher, async (req, res) => {
-    const { description } = req.body;
+    const { description, importance, optionalDueDate } = req.body;
     const classId = req.params.classId;
 
     try {
         const classInfo = await Class.findById(classId);
         if (!classInfo) {
-            console.error('Class not found with ID:', classId);
             return res.status(404).send('Class not found');
         }
 
         const completions = classInfo.students.map(studentId => ({
             student: studentId,
-            completed: false // All marked as incomplete initially
+            completed: false
         }));
 
-        // Create a new task with completions pre-populated
         const newTask = new Task({
             description,
             class: classId,
-            completions: completions
+            completions: completions,
+            importance: importance || 'medium',
+            optionalDueDate: optionalDueDate || null
         });
 
         const savedTask = await newTask.save();
 
-        // Update the class document to include the new task
         await Class.findByIdAndUpdate(classId, {
             $push: { tasks: savedTask._id }
         });
@@ -199,6 +197,7 @@ router.post('/create-task/:classId', verifyTeacher, async (req, res) => {
         res.status(500).send('Failed to create task');
     }
 });
+
 
 // View class details
 router.get('/view-class/:id', verifyTeacher, async (req, res) => {
@@ -280,9 +279,9 @@ router.get('/edit-task/:taskId', verifyTeacher, async (req, res) => {
 
 // Route to update a task
 router.post('/edit-task/:taskId', verifyTeacher, async (req, res) => {
-    const { description } = req.body;
+    const { description, importance, optionalDueDate } = req.body;
     try {
-        await Task.findByIdAndUpdate(req.params.taskId, { description });
+        await Task.findByIdAndUpdate(req.params.taskId, { description, importance, optionalDueDate });
         res.redirect('/teachers/manage-tasks/' + req.body.classId);
     } catch (error) {
         res.status(500).send('Error updating task');

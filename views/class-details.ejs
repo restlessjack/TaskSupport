@@ -18,7 +18,7 @@
             text-decoration: none;
             color: black;
         }
-        button {
+        button, .add-field {
             cursor: pointer;
             padding: 10px 20px;
             margin-top: 20px;
@@ -28,10 +28,10 @@
             border-radius: 5px;
             font-size: 16px;
         }
-        button:hover {
+        button:hover, .add-field:hover {
             background-color: #0056b3;
         }
-        input, textarea {
+        input, textarea, select {
             width: 95%;
             padding: 12px;
             margin: 8px 0;
@@ -40,7 +40,21 @@
             border-radius: 4px;
             box-sizing: border-box;
         }
+        .hidden {
+            display: none;
+        }
     </style>
+    <script>
+        function toggleField(fieldId, addButtonId, removeButtonId) {
+            const field = document.getElementById(fieldId);
+            const addButton = document.getElementById(addButtonId);
+            const removeButton = document.getElementById(removeButtonId);
+
+            field.classList.toggle('hidden');
+            addButton.classList.toggle('hidden');
+            removeButton.classList.toggle('hidden');
+        }
+    </script>
 </head>
 <body>
     <h1>Class: <%= classInfo.name %></h1>
@@ -64,6 +78,25 @@
     <form action="/teachers/create-task/<%= classInfo._id %>" method="post">
         <label for="description">Task Description:</label>
         <textarea id="description" name="description" required></textarea>
+        
+        <div id="importance-field" class="hidden">
+            <label for="importance">Importance:</label>
+            <select id="importance" name="importance">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+            <button type="button" id="remove-importance" class="hidden" onclick="toggleField('importance-field', 'add-importance', 'remove-importance')">- Remove Importance</button>
+        </div>
+        <button type="button" id="add-importance" class="add-field" onclick="toggleField('importance-field', 'add-importance', 'remove-importance')">+ Add Importance</button>
+
+        <div id="duedate-field" class="hidden">
+            <label for="optionalDueDate">Due Date:</label>
+            <input type="date" id="optionalDueDate" name="optionalDueDate">
+            <button type="button" id="remove-duedate" class="hidden" onclick="toggleField('duedate-field', 'add-duedate', 'remove-duedate')">- Remove Due Date</button>
+        </div>
+        <button type="button" id="add-duedate" class="add-field" onclick="toggleField('duedate-field', 'add-duedate', 'remove-duedate')">+ Add Due Date</button>
+
         <button type="submit">Add Task</button>
     </form>
     <form action="/teachers/manage-tasks/<%= classInfo._id %>" method="get">

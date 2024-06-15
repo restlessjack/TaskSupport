@@ -57,6 +57,7 @@ app.use('/users', userRoutes);  // User specific routes
 app.use('/students', studentRoutes);
 app.use('/teachers', teacherRoutes);
 
+
 app.use('/attendances', attendanceRoutes);
 
 app.listen(port, () => {

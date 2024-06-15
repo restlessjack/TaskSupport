@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Settings</title>
+    <style>
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Settings</h1>
+    <form action="/students/settings" method="post">
+        <label for="attendanceThreshold">Attendance Notification Threshold (%)</label>
+        <input type="number" id="attendanceThreshold" name="attendanceThreshold" value="<%= settings.attendanceThreshold %>" required>
+        
+        <label for="dueDateNotificationDays">Days Before Due Date for Notification</label>
+        <input type="number" id="dueDateNotificationDays" name="dueDateNotificationDays" value="<%= settings.dueDateNotificationDays %>" required>
+        
+        <button type="submit">Save Settings</button>
+    </form>
+    <button onclick="window.location.href='/students/student-dashboard'">Back to Dashboard</button>
+</body>
+</html>
