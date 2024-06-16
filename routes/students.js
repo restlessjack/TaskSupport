@@ -52,18 +52,24 @@ async function generateAttendanceNotifications(req, res, next) {
     try {
         const userId = req.session.userId;
         const classes = await Class.find({ students: userId });
-
         const settings = await UserSettings.findOne({ user: userId });
 
         await Promise.all(classes.map(async classInfo => {
             const { studentAttendancePercentage } = await calculateClassAttendance(classInfo._id, userId);
 
-            if (studentAttendancePercentage < settings.attendanceThreshold) { // Use user-defined threshold
+            if (studentAttendancePercentage < settings.attendanceThreshold) {
+                const oneDayAgo = new Date();
+                oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+
                 const existingNotification = await Notification.findOne({
                     user: userId,
                     type: 'Low Attendance',
                     class: classInfo._id,
-                    read: false
+                    $or: [
+                        { read: false },
+                        { dontShowAgain: true },
+                        { readAt: { $gt: oneDayAgo } } // Read within the last day
+                    ]
                 });
 
                 if (!existingNotification) {
@@ -82,17 +88,23 @@ async function generateAttendanceNotifications(req, res, next) {
         next();
     } catch (error) {
         console.error('Error generating notifications:', error);
-        res.status(500).send('Failed to generate notifications');
+        next(error);
     }
 }
 
-async function generateDueDateNotifications() {
+async function generateDueDateNotifications(req, res, next) {
     try {
-        const tasks = await Task.find({ "completions.completed": false });
+        const userId = req.session.userId;
+        const tasks = await Task.find({
+            "completions.student": userId,
+            "completions.completed": false
+        }).populate('class', 'name');
 
         for (const task of tasks) {
-            const classInfo = await Class.findById(task.class);
-            for (const completion of task.completions) {
+            const classInfo = task.class;
+            const completion = task.completions.find(c => c.student.toString() === userId.toString());
+
+            if (completion) {
                 const settings = await UserSettings.findOne({ user: completion.student });
 
                 if (settings && task.optionalDueDate) {
@@ -104,14 +116,14 @@ async function generateDueDateNotifications() {
                         const existingNotification = await Notification.findOne({
                             user: completion.student,
                             type: 'Due Date',
-                            task: task._id,
-                            read: false
+                            task: task._id
                         });
 
                         if (!existingNotification) {
                             const notification = new Notification({
                                 user: completion.student,
                                 type: 'Due Date',
+                                class: classInfo._id,
                                 task: task._id,
                                 message: `The task "${task.description}" in ${classInfo.name} is due on ${dueDate.toLocaleDateString()}.`,
                                 read: false
@@ -122,15 +134,18 @@ async function generateDueDateNotifications() {
                 }
             }
         }
+
+        next();
     } catch (error) {
         console.error('Error generating due date notifications:', error);
+        next(error);
     }
 }
 
-// Call this function periodically, e.g., once a day using a cron job or similar scheduler
-setInterval(generateDueDateNotifications, 24 * 60 * 60 * 1000); // Once a day
 
-router.get('/student-dashboard', verifyStudent, generateAttendanceNotifications, async (req, res) => {
+
+
+router.get('/student-dashboard', verifyStudent, generateAttendanceNotifications, generateDueDateNotifications, async (req, res) => {
     try {
         const userId = new mongoose.Types.ObjectId(req.session.userId); // Convert session userId to ObjectId
 
@@ -350,7 +365,7 @@ router.get('/student-new-tasks', verifyStudent, async (req, res) => {
 router.get('/student-notifications', verifyStudent, async (req, res) => {
     try {
         const userId = req.session.userId;
-        const notifications = await Notification.find({ user: userId });
+        const notifications = await Notification.find({ user: userId, read: false });
 
         res.render('student-notifications', { notifications });
     } catch (error) {
@@ -394,6 +409,55 @@ router.post('/settings', verifyStudent, async (req, res) => {
     } catch (error) {
         console.error('Error updating settings:', error);
         res.status(500).send('Failed to update settings');
+    }
+});
+
+// Mark a notification as read
+router.post('/notifications/read/:id', verifyStudent, async (req, res) => {
+    try {
+        await Notification.findByIdAndUpdate(req.params.id, { read: true });
+        res.redirect('/students/student-notifications');
+    } catch (error) {
+        console.error('Error marking notification as read:', error);
+        res.status(500).send('Failed to mark notification as read');
+    }
+});
+
+// Mark a notification as "don't show again"
+router.post('/notifications/dont-show-again/:id', verifyStudent, async (req, res) => {
+    try {
+        await Notification.findByIdAndUpdate(req.params.id, { read: true, dontShowAgain: true });
+        res.redirect('/students/student-notifications');
+    } catch (error) {
+        console.error('Error marking notification as "dont show again":', error);
+        res.status(500).send('Failed to mark notification as "dont show again"');
+    }
+});
+
+router.post('/notifications/mark', verifyStudent, async (req, res) => {
+    try {
+        const { markRead = [], dontShowAgain = [] } = req.body;
+
+        // Mark selected notifications as read
+        if (markRead.length > 0) {
+            await Notification.updateMany(
+                { _id: { $in: markRead } },
+                { $set: { read: true } }
+            );
+        }
+
+        // Mark selected notifications as don't show again
+        if (dontShowAgain.length > 0) {
+            await Notification.updateMany(
+                { _id: { $in: dontShowAgain } },
+                { $set: { read: true, dontShowAgain: true } }
+            );
+        }
+
+        res.redirect('/students/student-notifications');
+    } catch (error) {
+        console.error('Error marking notifications:', error);
+        res.status(500).send('Failed to mark notifications');
     }
 });
 

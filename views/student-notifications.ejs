@@ -17,17 +17,31 @@
         .read {
             background-color: #e9e9e9;
         }
+        button {
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
     <h1>Notifications</h1>
-    <% notifications.forEach(function(notification) { %>
-        <div class="notification <%= notification.read ? 'read' : 'unread' %>">
-            <p><strong>Type:</strong> <%= notification.type %></p>
-            <p><strong>Message:</strong> <%= notification.message %></p>
-            <p><strong>Date:</strong> <%= notification.date.toLocaleString() %></p>
-        </div>
-    <% }) %>
+    <form action="/students/notifications/mark" method="post">
+        <% notifications.forEach(function(notification) { %>
+            <div class="notification <%= notification.read ? 'read' : 'unread' %>">
+                <p><strong>Type:</strong> <%= notification.type %></p>
+                <p><strong>Message:</strong> <%= notification.message %></p>
+                <p><strong>Date:</strong> <%= notification.date.toLocaleString() %></p>
+                <label>
+                    <input type="checkbox" name="markRead[]" value="<%= notification._id %>"> Mark as Read
+                </label>
+                <% if (notification.type === 'Low Attendance') { %>
+                    <label>
+                        <input type="checkbox" name="dontShowAgain[]" value="<%= notification._id %>"> Don't Show Again
+                    </label>
+                <% } %>
+            </div>
+        <% }) %>
+        <button type="submit">Submit</button>
+    </form>
     <button onclick="history.back()">Back</button>
 </body>
 </html>
