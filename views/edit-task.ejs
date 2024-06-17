@@ -33,6 +33,17 @@
     <form action="/teachers/edit-task/<%= task._id %>" method="post">
         <label for="description">Task Description:</label>
         <textarea id="description" name="description" required><%= task.description %></textarea>
+        
+        <label for="importance">Importance:</label>
+        <select id="importance" name="importance" required>
+            <option value="low" <%= task.importance === 'low' ? 'selected' : '' %>>Low</option>
+            <option value="medium" <%= task.importance === 'medium' ? 'selected' : '' %>>Medium</option>
+            <option value="high" <%= task.importance === 'high' ? 'selected' : '' %>>High</option>
+        </select>
+
+        <label for="optionalDueDate">Optional Due Date:</label>
+        <input type="date" id="optionalDueDate" name="optionalDueDate" value="<%= task.optionalDueDate ? task.optionalDueDate.toISOString().split('T')[0] : '' %>">
+
         <input type="hidden" name="classId" value="<%= task.class %>">
         <button type="submit">Update Task</button>
     </form>
