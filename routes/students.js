@@ -242,22 +242,50 @@ router.get('/student-class-details/:classId', verifyStudent, async (req, res) =>
         const userId = req.session.userId;
 
         const classInfo = await Class.findById(classId).populate('tasks');
-        const tasks = classInfo.tasks || [];
+        let tasks = classInfo.tasks || [];
+
+        // Separate tasks into incomplete and complete
+        const incompleteTasks = tasks.filter(task =>
+            task.completions.some(c => c.student.toString() === userId.toString() && !c.completed)
+        );
+
+        const completeTasks = tasks.filter(task =>
+            task.completions.some(c => c.student.toString() === userId.toString() && c.completed)
+        );
+
+        // Sort incomplete tasks by importance and due date
+        incompleteTasks.sort((a, b) => {
+            // Sort by importance first (high > medium > low)
+            const importanceOrder = { 'high': 1, 'medium': 2, 'low': 3 };
+            if (importanceOrder[a.importance] !== importanceOrder[b.importance]) {
+                return importanceOrder[a.importance] - importanceOrder[b.importance];
+            }
+            // Then sort by due date (earliest first)
+            const aDueDate = a.optionalDueDate ? new Date(a.optionalDueDate) : new Date(8640000000000000);
+            const bDueDate = b.optionalDueDate ? new Date(b.optionalDueDate) : new Date(8640000000000000);
+            return aDueDate - bDueDate;
+        });
+
+        // Combine incomplete tasks followed by complete tasks
+        tasks = [...incompleteTasks, ...completeTasks];
 
         const { totalAttendancePercentage, studentAttendancePercentage } = await calculateClassAttendance(classId, userId);
 
         res.render('student-class-details', {
             className: classInfo.name,
+            classId: classId,
             totalAttendancePercentage: totalAttendancePercentage.toFixed(2),
             studentAttendancePercentage: studentAttendancePercentage.toFixed(2),
             tasks: tasks,
-            userId: userId
+            userId: userId,
+            req: req // Pass req to the template
         });
     } catch (error) {
         console.error('Error retrieving class and task details for student:', error);
         res.status(500).send('Failed to retrieve class and task details');
     }
 });
+
 
 router.get('/student-incomplete-tasks', verifyStudent, async (req, res) => {
     try {
@@ -302,7 +330,8 @@ router.get('/student-incomplete-tasks', verifyStudent, async (req, res) => {
         res.render('student-incomplete-tasks', {
             newTasks: newTasks,
             otherTasks: otherTasks,
-            userId: userId
+            userId: userId,
+            req: req // Pass req to the template
         });
     } catch (error) {
         console.error('Error retrieving incomplete tasks:', error);
@@ -318,13 +347,14 @@ router.get('/student-incomplete-tasks', verifyStudent, async (req, res) => {
 
 
 
+
 router.post('/mark-tasks-complete', verifyStudent, async (req, res) => {
     try {
         const userId = req.session.userId;
-        const { completedTasks } = req.body;
+        const { completedTasks, returnUrl } = req.body;
 
         if (!completedTasks) {
-            return res.redirect('/students/student-incomplete-tasks');
+            return res.redirect(returnUrl || '/students/student-incomplete-tasks');
         }
 
         const taskIds = Array.isArray(completedTasks) ? completedTasks : [completedTasks];
@@ -336,12 +366,13 @@ router.post('/mark-tasks-complete', verifyStudent, async (req, res) => {
             );
         }));
 
-        return res.redirect('/students/student-incomplete-tasks');
+        return res.redirect(returnUrl || '/students/student-incomplete-tasks');
     } catch (error) {
         console.error('Error marking tasks as complete:', error);
         res.status(500).send('Failed to mark tasks as complete');
     }
 });
+
 
 router.get('/student-new-tasks', verifyStudent, async (req, res) => {
     try {

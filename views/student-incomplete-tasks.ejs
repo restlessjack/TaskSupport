@@ -19,6 +19,7 @@
 <body>
     <h1>Your Incomplete Tasks</h1>
     <form action="/students/mark-tasks-complete" method="post">
+        <input type="hidden" name="returnUrl" value="<%= req.originalUrl %>">
         <% if (newTasks && newTasks.length > 0) { %>
             <h2>New Tasks</h2>
             <ul>

@@ -9,17 +9,28 @@
     <h1>Class: <%= className %></h1>
     <h2>Your Attendance Percentage: <%= totalAttendancePercentage %> %</h2>
     <h2>Tasks:</h2>
-    <ul>
-        <% tasks.forEach(function(task) { %>
-            <li>
-                <%= task.description %> - Due: <%= new Date(task.date).toISOString().slice(0, 10) %>
-                <% if (task.completions.find(c => c.student.toString() === userId.toString()).completed) { %>
-                    <strong>Completed</strong>
-                <% } else { %>
-                    <strong>Incomplete</strong>
-                <% } %>
-            </li>
-        <% }); %>
-    </ul>
+    <form action="/students/mark-tasks-complete" method="post">
+        <input type="hidden" name="returnUrl" value="<%= req.originalUrl %>">
+        <ul>
+            <% tasks.forEach(function(task) { %>
+                <li>
+                    <strong>Description:</strong> <%= task.description %> - 
+                    <strong>Due:</strong> <%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'No due date' %> -
+                    <strong>Importance:</strong> <%= task.importance %> -
+                    <% if (task.completions.find(c => c.student.toString() === userId.toString()).completed) { %>
+                        <strong>Completed</strong>
+                    <% } else { %>
+                        <strong>Incomplete</strong>
+                        <label>
+                            <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
+                        </label>
+                    <% } %>
+                </li>
+            <% }); %>
+        </ul>
+        <input type="hidden" name="classId" value="<%= classId %>">
+        <button type="submit">Submit Changes</button>
+    </form>
+    <button onclick="window.location.href='/students/student-dashboard'">Back to Dashboard</button>
 </body>
 </html>
