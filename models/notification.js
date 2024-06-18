@@ -9,7 +9,8 @@ const notificationSchema = new mongoose.Schema({
     dontShowAgain: { type: Boolean, default: false }, // Add this field to handle "don't show again"
     date: { type: Date, default: Date.now },
     task: { type: mongoose.Schema.Types.ObjectId, ref: 'Task' }, // Add task reference
-    readAt: { type: Date } // New field to track when the notification was read
+    readAt: { type: Date }, // New field to track when the notification was read
+    new: { type: Boolean, default: true } // New attribute to track new notifications
 });
 
 const Notification = mongoose.model('Notification', notificationSchema);

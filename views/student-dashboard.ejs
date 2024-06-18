@@ -5,12 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
     <style>
-        .new-tasks-notification {
+        .new-notifications {
             color: red;
             font-weight: bold;
         }
     </style>
     <script>
+        async function checkNewNotifications() {
+            try {
+                const response = await fetch('/students/student-new-notifications');
+                const data = await response.json();
+                const newNotificationsElement = document.getElementById('new-notifications');
+
+                if (data.notifications.length > 0) {
+                    newNotificationsElement.innerText = ' (New Notifications Available)';
+                } else {
+                    newNotificationsElement.innerText = '';
+                }
+            } catch (error) {
+                console.error('Error checking new notifications:', error);
+            }
+        }
+
         async function checkNewTasks() {
             try {
                 const response = await fetch('/students/student-new-tasks');
@@ -29,6 +45,7 @@
 
         window.onload = function() {
             checkNewTasks();
+            checkNewNotifications();
         }
     </script>
 </head>
@@ -43,7 +60,11 @@
                 <a href="/students/student-incomplete-tasks">View Incomplete Tasks</a>
                 <span id="new-tasks-notification"></span>
             </li>
-            <li><a href="/students/student-notifications">View Notifications</a></li>
+            <li>
+                <a href="/students/student-notifications">View Notifications</a>
+                <span id="new-notifications"></span>
+            </li>
+            <li><a href="/students/settings">Settings</a></li>
             <li><a href="/users/logout">Logout</a></li>
         </ul>
     </nav>

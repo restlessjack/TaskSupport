@@ -95,24 +95,32 @@ async function generateAttendanceNotifications(req, res, next) {
 async function generateDueDateNotifications(req, res, next) {
     try {
         const userId = req.session.userId;
+        
+        
         const tasks = await Task.find({
             "completions.student": userId,
             "completions.completed": false
         }).populate('class', 'name');
 
         for (const task of tasks) {
+            
             const classInfo = task.class;
             const completion = task.completions.find(c => c.student.toString() === userId.toString());
 
             if (completion) {
+                
                 const settings = await UserSettings.findOne({ user: completion.student });
 
                 if (settings && task.optionalDueDate) {
+                    
                     const dueDate = new Date(task.optionalDueDate);
                     const notificationDate = new Date(dueDate);
                     notificationDate.setDate(dueDate.getDate() - settings.dueDateNotificationDays);
 
-                    if (notificationDate <= new Date() && !completion.new) {
+                    
+
+                    if (notificationDate <= new Date() ) {
+                        
                         const existingNotification = await Notification.findOne({
                             user: completion.student,
                             type: 'Due Date',
@@ -120,6 +128,8 @@ async function generateDueDateNotifications(req, res, next) {
                         });
 
                         if (!existingNotification) {
+                            console.log(`notification`);
+                            
                             const notification = new Notification({
                                 user: completion.student,
                                 type: 'Due Date',
@@ -300,8 +310,7 @@ router.get('/student-incomplete-tasks', verifyStudent, async (req, res) => {
             select: 'name' // Only fetch the class name
         });
 
-        console.log("Fetching tasks for user:", userId);
-        console.log("Fetched tasks:", tasks);
+        
 
         // Mark new tasks as read
         const result = await Task.updateMany(
@@ -310,7 +319,7 @@ router.get('/student-incomplete-tasks', verifyStudent, async (req, res) => {
             { arrayFilters: [{ "elem.student": userId }] }
         );
 
-        console.log("Marked new tasks as read:", result);
+       
 
         const newTasks = tasks.filter(task => 
             task.completions.some(completion => 
@@ -324,8 +333,7 @@ router.get('/student-incomplete-tasks', verifyStudent, async (req, res) => {
             )
         );
 
-        console.log("New tasks:", newTasks);
-        console.log("Other incomplete tasks:", otherTasks);
+        
 
         res.render('student-incomplete-tasks', {
             newTasks: newTasks,
@@ -384,6 +392,7 @@ router.get('/student-new-tasks', verifyStudent, async (req, res) => {
             "completions.completed": false,
             "completions.new": true
         }).populate('class', 'name');
+        
 
         res.json({ tasks: tasks });
     } catch (error) {
@@ -396,14 +405,15 @@ router.get('/student-new-tasks', verifyStudent, async (req, res) => {
 router.get('/student-notifications', verifyStudent, async (req, res) => {
     try {
         const userId = req.session.userId;
-        const notifications = await Notification.find({ user: userId, read: false });
-
+        let notifications = await Notification.find({ user: userId, read: false });
+        notifications = notifications.reverse(); // Reverse to show the most recent ones first if needed
         res.render('student-notifications', { notifications });
     } catch (error) {
         console.error('Error retrieving notifications:', error);
         res.status(500).send('Failed to retrieve notifications');
     }
 });
+
 
 // Display settings page
 router.get('/settings', verifyStudent, async (req, res) => {
@@ -489,6 +499,23 @@ router.post('/notifications/mark', verifyStudent, async (req, res) => {
     } catch (error) {
         console.error('Error marking notifications:', error);
         res.status(500).send('Failed to mark notifications');
+    }
+});
+
+router.get('/student-new-notifications', verifyStudent, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+
+        // Fetch new notifications for the student
+        const notifications = await Notification.find({
+            user: userId,
+            new: true
+        });
+
+        res.json({ notifications: notifications });
+    } catch (error) {
+        console.error('Error retrieving new notifications:', error);
+        res.status(500).send('Failed to retrieve new notifications');
     }
 });
 
