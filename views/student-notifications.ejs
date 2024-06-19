@@ -42,7 +42,24 @@
         <% }) %>
         <button type="submit">Submit</button>
     </form>
-    <button onclick="history.back()">Back</button>
+    <button onclick="window.location.href='/students/student-dashboard'">Back to Dashboard</button>
+    <script>
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden') {
+                fetch('/students/mark-notifications-not-new', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include' // Important for session handling
+                }).then(response => {
+                    console.log('Notifications marked as not new');
+                }).catch(error => {
+                    console.error('Error marking notifications as not new', error);
+                });
+            }
+        });
+        </script>
 </body>
 </html>
 

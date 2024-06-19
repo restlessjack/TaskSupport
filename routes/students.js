@@ -3,6 +3,7 @@ const router = express.Router();
 const Class = require('../models/class');
 const Notification = require('../models/notification');
 const Attendance = require('../models/attendance');
+const { changeUserPassword } = require('../utils/userUtils'); // Adjust path if necessary
 const Task = require('../models/task');
 const mongoose = require('mongoose');
 const UserSettings = require('../models/userSettings');
@@ -220,6 +221,7 @@ router.get('/student-dashboard', verifyStudent, generateAttendanceNotifications,
 
         const totalTaskCompletionPercentage = taskResults.length > 0 ? taskResults[0].totalTaskCompletionPercentage : 0;
 
+        
         res.render('student-dashboard', {
             username: req.session.username,
             totalAttendancePercentage: totalAttendancePercentage.toFixed(2),
@@ -414,7 +416,6 @@ router.get('/student-notifications', verifyStudent, async (req, res) => {
     }
 });
 
-
 // Display settings page
 router.get('/settings', verifyStudent, async (req, res) => {
     try {
@@ -427,7 +428,7 @@ router.get('/settings', verifyStudent, async (req, res) => {
             await settings.save();
         }
 
-        res.render('student-settings', { settings });
+        res.render('student-settings', { settings, message: null, messageType: null });
     } catch (error) {
         console.error('Error loading settings:', error);
         res.status(500).send('Failed to load settings');
@@ -518,5 +519,43 @@ router.get('/student-new-notifications', verifyStudent, async (req, res) => {
         res.status(500).send('Failed to retrieve new notifications');
     }
 });
+
+router.post('/mark-notifications-not-new', verifyStudent, async (req, res) => {
+    try {
+        const userId = req.session.userId; // Derive userId from session for security
+        await Notification.updateMany(
+            { user: userId, new: true },
+            { $set: { new: false } }
+        );
+        res.status(200).json({ message: 'Notifications marked as not new' });
+    } catch (error) {
+        console.error('Error marking notifications as not new:', error);
+        res.status(500).json({ message: 'Failed to mark notifications as not new' });
+    }
+});
+
+
+
+router.post('/change-password', verifyStudent, async (req, res) => {
+    const { oldPassword, newPassword, confirmPassword } = req.body;
+    const userId = req.session.userId;
+
+    const result = await changeUserPassword(userId, oldPassword, newPassword, confirmPassword);
+
+    try {
+        const settings = await UserSettings.findOne({ user: userId });
+
+        if (result.success) {
+            res.render('student-settings', { settings, message: result.message, messageType: 'success' });
+        } else {
+            res.render('student-settings', { settings, message: result.message, messageType: 'error' });
+        }
+    } catch (error) {
+        console.error('Error loading settings:', error);
+        res.status(500).send('Failed to load settings');
+    }
+});
+
+
 
 module.exports = router;

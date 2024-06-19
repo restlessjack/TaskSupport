@@ -5,6 +5,7 @@ const User = require('../models/user');
 const Task = require('../models/task');
 const Attendance = require('../models/attendance');
 const { calculatePercent } = require('../utils/calculationUtils');
+const { changeUserPassword } = require('../utils/userUtils'); // Adjust path if necessary
 
 // Middleware to verify if the user is a teacher
 function verifyTeacher(req, res, next) {
@@ -296,6 +297,28 @@ router.post('/delete-task/:taskId', verifyTeacher, async (req, res) => {
         res.redirect('/teachers/manage-tasks/' + req.body.classId);
     } catch (error) {
         res.status(500).send('Error deleting task');
+    }
+});
+
+
+
+// Display teacher settings page
+router.get('/settings', verifyTeacher, async (req, res) => {
+    res.render('teacher-settings', { message: null, messageType: null });
+});
+
+
+// Route for handling password change
+router.post('/change-password', verifyTeacher, async (req, res) => {
+    const { oldPassword, newPassword, confirmPassword } = req.body;
+    const userId = req.session.userId;
+
+    const result = await changeUserPassword(userId, oldPassword, newPassword, confirmPassword);
+
+    if (result.success) {
+        res.render('teacher-settings', { message: result.message, messageType: 'success' });
+    } else {
+        res.render('teacher-settings', { message: result.message, messageType: 'error' });
     }
 });
 
