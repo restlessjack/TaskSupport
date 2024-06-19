@@ -50,4 +50,27 @@ router.post('/attendance/:classId', verifyTeacher, async (req, res) => {
     }
 });
 
+// Route to get attendance data for a class
+router.get('/attendance-data/:classId', verifyTeacher, async (req, res) => {
+    const classId = req.params.classId;
+
+    try {
+        const attendanceRecords = await Attendance.find({ class: classId }).exec();
+
+        // Process the data to get the desired format
+        const processedData = attendanceRecords.map(record => {
+            const date = record.date.toISOString().split('T')[0];
+            const presentCount = record.records.filter(r => r.status === 'Present').length;
+            const absentCount = record.records.filter(r => r.status === 'Absent').length;
+
+            return { date, presentCount, absentCount };
+        });
+
+        res.json(processedData);
+    } catch (error) {
+        console.error('Error retrieving attendance data:', error);
+        res.status(500).json({ error: 'Failed to retrieve attendance data' });
+    }
+});
+
 module.exports = router;
