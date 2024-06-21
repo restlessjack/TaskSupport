@@ -53,7 +53,12 @@ async function generateAttendanceNotifications(req, res, next) {
     try {
         const userId = req.session.userId;
         const classes = await Class.find({ students: userId });
-        const settings = await UserSettings.findOne({ user: userId });
+        let settings = await UserSettings.findOne({ user: userId });
+
+        if (!settings) {
+            settings = new UserSettings({ user: userId });
+            await settings.save();
+        }
 
         await Promise.all(classes.map(async classInfo => {
             const { studentAttendancePercentage } = await calculateClassAttendance(classInfo._id, userId);
@@ -93,35 +98,33 @@ async function generateAttendanceNotifications(req, res, next) {
     }
 }
 
+
 async function generateDueDateNotifications(req, res, next) {
     try {
         const userId = req.session.userId;
-        
-        
         const tasks = await Task.find({
             "completions.student": userId,
             "completions.completed": false
         }).populate('class', 'name');
 
         for (const task of tasks) {
-            
             const classInfo = task.class;
             const completion = task.completions.find(c => c.student.toString() === userId.toString());
 
             if (completion) {
-                
-                const settings = await UserSettings.findOne({ user: completion.student });
+                let settings = await UserSettings.findOne({ user: completion.student });
 
-                if (settings && task.optionalDueDate) {
-                    
+                if (!settings) {
+                    settings = new UserSettings({ user: completion.student });
+                    await settings.save();
+                }
+
+                if (task.optionalDueDate) {
                     const dueDate = new Date(task.optionalDueDate);
                     const notificationDate = new Date(dueDate);
                     notificationDate.setDate(dueDate.getDate() - settings.dueDateNotificationDays);
 
-                    
-
-                    if (notificationDate <= new Date() ) {
-                        
+                    if (notificationDate <= new Date()) {
                         const existingNotification = await Notification.findOne({
                             user: completion.student,
                             type: 'Due Date',
@@ -129,8 +132,6 @@ async function generateDueDateNotifications(req, res, next) {
                         });
 
                         if (!existingNotification) {
-                            console.log(`notification`);
-                            
                             const notification = new Notification({
                                 user: completion.student,
                                 type: 'Due Date',
@@ -152,6 +153,7 @@ async function generateDueDateNotifications(req, res, next) {
         next(error);
     }
 }
+
 
 
 

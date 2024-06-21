@@ -43,7 +43,20 @@
         .hidden {
             display: none;
         }
+        /* Style for the chart container */
+        .chart-container {
+            width: 600px; /* Adjust as needed */
+            height: 400px; /* Adjust as needed */
+            margin: auto; /* Center the chart */
+        }
+        canvas {
+            display: block; /* Prevent extra space below canvas */
+        }
     </style>
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Include the date adapter for Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <script>
         function toggleField(fieldId, addButtonId, removeButtonId) {
             const field = document.getElementById(fieldId);
@@ -54,11 +67,74 @@
             addButton.classList.toggle('hidden');
             removeButton.classList.toggle('hidden');
         }
+
+        async function fetchAttendanceData() {
+            console.log('Fetching attendance data...');
+            const response = await fetch('/attendances/attendance-data/<%= classInfo._id %>');
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Fetched Attendance Data:', data); // Log the fetched data
+                return data;
+            } else {
+                console.error('Failed to fetch attendance data:', response.statusText);
+                return [];
+            }
+        }
+
+        async function renderChart() {
+            const data = await fetchAttendanceData();
+            console.log('Data for Chart:', data);
+
+            const labels = data.map(record => record.date);
+            const attendancePercentages = data.map(record => {
+                const total = record.presentCount + record.absentCount;
+                return (record.presentCount / total) * 100;
+            });
+
+            console.log('Labels:', labels);
+            console.log('Attendance Percentages:', attendancePercentages);
+
+            const ctx = document.getElementById('attendanceChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Attendance Percentage',
+                            data: attendancePercentages,
+                            borderColor: 'blue',
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderChart);
     </script>
 </head>
 <body>
     <h1>Class: <%= classInfo.name %></h1>
     <h2>Total Attendance Percentage: <%= totalAttendancePercentage.toFixed(2) %> %</h2>
+    <h2>Attendance Over Time</h2>
+    <div class="chart-container">
+        <canvas id="attendanceChart"></canvas>
+    </div>
     <h2>Student List:</h2>
     <ul>
         <% if (studentAttendancePercentages && studentAttendancePercentages.length > 0) { %>
@@ -74,6 +150,9 @@
         <button type="submit">Create Attendance Report</button>
     </form>
     </ul>
+
+    
+
     <!-- Form to add a new task -->
     <form action="/teachers/create-task/<%= classInfo._id %>" method="post">
         <label for="description">Task Description:</label>
