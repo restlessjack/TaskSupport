@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Attendance Report</title>
+    <style>
+        .chart-container {
+            width: 600px; /* Adjust as needed */
+            height: 400px; /* Adjust as needed */
+            margin: auto; /* Center the chart */
+        }
+        canvas {
+            display: block; /* Prevent extra space below canvas */
+        }
+    </style>
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Include the date adapter for Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script>
+        async function fetchAttendanceData() {
+            const response = await fetch('/students/student-attendance-data');
+            if (response.ok) {
+                return await response.json();
+            } else {
+                console.error('Failed to fetch attendance data:', response.statusText);
+                return [];
+            }
+        }
+
+        async function renderChart() {
+            const data = await fetchAttendanceData();
+            console.log(data);
+
+            const labels = data.map(record => record.date);
+            const cumulativePercentages = data.map(record => record.cumulativePercentage);
+
+            const ctx = document.getElementById('attendanceChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Cumulative Attendance Percentage',
+                            data: cumulativePercentages,
+                            borderColor: 'blue',
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + "%";
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderChart);
+    </script>
+</head>
+<body>
+    <h1>Attendance Report</h1>
+    <p>Average Attendance Percentage: <%= averageAttendancePercentage %> %</p>
+    <h2>Attendance Over Time</h2>
+    <div class="chart-container">
+        <canvas id="attendanceChart"></canvas>
+    </div>
+    <a href="/students/student-dashboard">Back to Dashboard</a>
+</body>
+</html>

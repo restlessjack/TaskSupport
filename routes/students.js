@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Class = require('../models/class');
 const Notification = require('../models/notification');
+const { calculateClassAttendance } = require('../utils/attendanceUtils');
 const Attendance = require('../models/attendance');
 const { changeUserPassword } = require('../utils/userUtils'); // Adjust path if necessary
 const Task = require('../models/task');
@@ -15,39 +16,8 @@ function verifyStudent(req, res, next) {
     next();
 }
 
-async function calculateClassAttendance(classId, userId) {
-    const attendanceDocs = await Attendance.find({ class: classId }).select('records.student records.status');
 
-    // Flatten the records into a single array of { student, status }
-    const allAttendanceRecords = attendanceDocs.flatMap(doc => doc.records.map(record => ({
-        student: record.student,
-        status: record.status
-    })));
 
-    // Calculate the total attendance percentage
-    const totalAttendancePercentage = calculatePercent(allAttendanceRecords);
-
-    let studentAttendancePercentage = 0;
-    if (userId) {
-        const studentRecords = allAttendanceRecords.filter(record =>
-            record.student.toString() === userId.toString());
-        studentAttendancePercentage = calculatePercent(studentRecords);
-    }
-
-    return {
-        totalAttendancePercentage,
-        studentAttendancePercentage
-    };
-}
-
-function calculatePercent(records) {
-    if (records.length === 0) return 0;
-
-    const totalSessions = records.length;
-    const totalPresent = records.filter(record => record.status === 'Present').length;
-
-    return (totalPresent / totalSessions) * 100;
-}
 
 async function generateAttendanceNotifications(req, res, next) {
     try {
@@ -385,18 +355,22 @@ router.post('/mark-tasks-complete', verifyStudent, async (req, res) => {
     }
 });
 
-
 router.get('/student-new-tasks', verifyStudent, async (req, res) => {
     try {
         const userId = req.session.userId;
 
-        // Fetch new tasks for the student
+        // Fetch new tasks for the student using $elemMatch
         const tasks = await Task.find({
-            "completions.student": userId,
-            "completions.completed": false,
-            "completions.new": true
+            completions: {
+                $elemMatch: {
+                    student: userId,
+                    completed: false,
+                    new: true
+                }
+            }
         }).populate('class', 'name');
         
+        console.log('New tasks for student:', tasks);
 
         res.json({ tasks: tasks });
     } catch (error) {
@@ -558,6 +532,100 @@ router.post('/change-password', verifyStudent, async (req, res) => {
     }
 });
 
+
+router.get('/student-attendance-report', verifyStudent, async (req, res) => {
+    const userId = req.session.userId;
+
+    try {
+        const attendanceRecords = await Attendance.find({ "records.student": userId }).exec();
+        const totalSessions = attendanceRecords.length;
+        const totalPresent = attendanceRecords.reduce((acc, record) => {
+            const studentRecord = record.records.find(r => r.student.toString() === userId.toString());
+            return acc + (studentRecord.status === 'Present' ? 1 : 0);
+        }, 0);
+
+        const averageAttendancePercentage = totalSessions > 0 ? (totalPresent / totalSessions) * 100 : 0;
+
+        res.render('student-attendance-report', {
+            attendanceRecords,
+            averageAttendancePercentage: averageAttendancePercentage.toFixed(2),
+        });
+    } catch (error) {
+        console.error('Error retrieving attendance report:', error);
+        res.status(500).send('Failed to retrieve attendance report');
+    }
+});
+
+router.get('/student-attendance-data', verifyStudent, async (req, res) => {
+    const userId = req.session.userId;
+
+    try {
+        const attendanceRecords = await Attendance.find({ "records.student": userId }).sort({ date: 1 }).exec();
+        let totalSessions = 0;
+        let totalPresent = 0;
+
+        const processedData = attendanceRecords.map(record => {
+            totalSessions += 1;
+            const studentRecord = record.records.find(r => r.student.toString() === userId.toString());
+            if (studentRecord.status === 'Present') {
+                totalPresent += 1;
+            }
+            const cumulativePercentage = (totalPresent / totalSessions) * 100;
+            return { date: record.date.toISOString().split('T')[0], cumulativePercentage };
+        });
+
+        res.json(processedData);
+    } catch (error) {
+        console.error('Error retrieving attendance data:', error);
+        res.status(500).json({ error: 'Failed to retrieve attendance data' });
+    }
+});
+
+router.get('/class-attendance-report/:classId', verifyStudent, async (req, res) => {
+    const userId = req.session.userId;
+    const classId = req.params.classId;
+
+    try {
+        const { totalAttendancePercentage, studentAttendancePercentage } = await calculateClassAttendance(classId, userId);
+
+        res.render('class-attendance-report', {
+            classId,
+            totalAttendancePercentage: totalAttendancePercentage.toFixed(2),
+            studentAttendancePercentage: studentAttendancePercentage.toFixed(2),
+        });
+    } catch (error) {
+        console.error('Error retrieving class attendance report:', error);
+        res.status(500).send('Failed to retrieve class attendance report');
+    }
+});
+
+router.get('/class-attendance-data/:classId', verifyStudent, async (req, res) => {
+    const classId = req.params.classId;
+    const userId = req.session.userId;
+    console.log("Fetching attendance data for class:", classId, "and student:", userId);
+
+    try {
+        const attendanceRecords = await Attendance.find({ class: classId }).sort({ date: 1 }).exec();
+        let totalSessions = 0;
+        let totalPresent = 0;
+
+        const processedData = attendanceRecords.map(record => {
+            totalSessions += 1;
+            const studentRecord = record.records.find(r => r.student.toString() === userId.toString());
+            if (studentRecord && studentRecord.status === 'Present') {
+                totalPresent += 1;
+            }
+            const cumulativePercentage = (totalPresent / totalSessions) * 100;
+            return { date: record.date.toISOString().split('T')[0], cumulativePercentage };
+        });
+        console.log('Processed Attendance Data:', processedData); 
+
+        res.json(processedData);
+    } catch (error) {
+        console.error('Error retrieving class attendance data:', error);
+        res.status(500).json({ error: 'Failed to retrieve class attendance data' });
+    }
+});
 
 
 module.exports = router;

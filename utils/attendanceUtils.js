@@ -1,7 +1,6 @@
-// attendanceUtils.js
 const Attendance = require('../models/attendance');
 
-async function calculateAttendance(classId) {
+async function calculateClassAttendance(classId, studentId) {
     const attendanceRecords = await Attendance.find({ class: classId });
     let totalPresent = 0;
     let totalRecords = 0;
@@ -24,9 +23,13 @@ async function calculateAttendance(classId) {
     });
 
     const totalAttendancePercentage = totalRecords > 0 ? (totalPresent / totalRecords) * 100 : 0;
-    return { totalAttendancePercentage, studentAttendance };
+    const studentAttendancePercentage = studentAttendance[studentId]
+        ? (studentAttendance[studentId].present / studentAttendance[studentId].total) * 100
+        : 0;
+
+    return { totalAttendancePercentage, studentAttendancePercentage };
 }
 
 module.exports = {
-    calculateAttendance
+    calculateClassAttendance
 };

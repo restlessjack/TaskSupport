@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>Class: <%= className %></h1>
-    <h2>Your Attendance Percentage: <%= totalAttendancePercentage %> %</h2>
+    
     <h2>Tasks:</h2>
     <form action="/students/mark-tasks-complete" method="post">
         <input type="hidden" name="returnUrl" value="<%= req.originalUrl %>">
@@ -31,6 +31,11 @@
         <input type="hidden" name="classId" value="<%= classId %>">
         <button type="submit">Submit Changes</button>
     </form>
+    <br>
+    <button onclick="window.location.href='/students/class-attendance-report/<%= classId %>'">View Attendance Report</button>
+    <br>
+    <br>
+    
     <button onclick="window.location.href='/students/student-dashboard'">Back to Dashboard</button>
 </body>
 </html>

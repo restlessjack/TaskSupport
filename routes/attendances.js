@@ -11,6 +11,8 @@ function verifyTeacher(req, res, next) {
     next();
 }
 
+
+
 // Route to display the attendance form
 router.get('/attendance/:classId', verifyTeacher, async (req, res) => {
     try {
