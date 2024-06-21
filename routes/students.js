@@ -274,16 +274,17 @@ router.get('/student-class-details/:classId', verifyStudent, async (req, res) =>
 router.get('/student-incomplete-tasks', verifyStudent, async (req, res) => {
     try {
         const userId = req.session.userId;
-
-        // Fetch tasks where the student's completions are marked as false
         const tasks = await Task.find({
-            "completions.student": userId,
-            "completions.completed": false
+            completions: {
+                $elemMatch: {
+                    student: userId,
+                    completed: false
+                }
+            }
         }).populate({
             path: 'class',
             select: 'name' // Only fetch the class name
         });
-
         
 
         // Mark new tasks as read
