@@ -1,0 +1,24 @@
+
+<style>
+    nav.navbar  {
+        
+        border-bottom: 1px solid #ccc; /* Adding a bottom border to create a dividing line */
+    }
+</style>
+<nav class="navbar">
+    <% if (userRole === 'teacher') { %>
+        <ul>
+            <li><a href="/teachers/dashboard">Dashboard</a></li>
+            <li><a href="/teachers/classes">Classes</a></li>
+            <li><a href="/teachers/settings">Settings</a></li>
+            <li><a href="/users/logout">Logout</a></li>
+        </ul>
+    <% } else if (userRole === 'student') { %>
+        <ul>
+            <li><a href="/students/student-dashboard">Dashboard</a></li>
+            <li><a href="/students/student-classes">Classes</a></li>
+            <li><a href="/students/settings">Settings</a></li>
+            <li><a href="/users/logout">Logout</a></li>
+        </ul>
+    <% } %>
+</nav>

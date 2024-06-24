@@ -61,8 +61,8 @@
                 <li class="task">
                     <strong>Description:</strong> <%= task.description %> - 
                     <strong>Due:</strong> <%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'No due date' %> -
-                    <strong>Importance:</strong> <%= task.importance %> -
-                    <strong>Incomplete</strong>
+                    <strong>Importance:</strong> <%= task.importance %>
+                   
                     <label>
                         <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
                     </label>
@@ -76,8 +76,8 @@
                 <li class="task">
                     <strong>Description:</strong> <%= task.description %> - 
                     <strong>Due:</strong> <%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'No due date' %> -
-                    <strong>Importance:</strong> <%= task.importance %> -
-                    <strong>Completed</strong>
+                    <strong>Importance:</strong> <%= task.importance %>
+                  
                 </li>
             <% }); %>
         </ul>

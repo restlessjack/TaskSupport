@@ -49,6 +49,11 @@ app.use(session({
     }
 }));
 
+app.use((req, res, next) => {
+    res.locals.userRole = req.session.userRole;
+    next();
+});
+
 // Setup routes
 app.use('/', indexRoutes);  // Home and general routes
 app.use('/users', userRoutes);  // User specific routes
