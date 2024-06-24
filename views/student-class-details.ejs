@@ -4,30 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Details</title>
+    <style>
+        .task {
+            border: 2px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .circular-progress {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            background: conic-gradient(#4caf50 var(--percentage), #ddd var(--percentage));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px; /* Add margin to the right */
+            float: left; /* Float to the left */
+        }
+
+        .circular-progress::before {
+            content: attr(data-completed) '/' attr(data-total);
+            position: absolute;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .task-list {
+            overflow: hidden; /* Clear floats */
+        }
+    </style>
 </head>
 <body>
     <h1>Class: <%= className %></h1>
-    
-    <h2>Tasks:</h2>
+
+    <div class="task-list">
+        <h2>Tasks Completion</h2>
+        <%
+            let completedTasks = 0;
+            let totalTasks = tasks.length;
+            tasks.forEach(task => {
+                if (task.completions.find(c => c.student.toString() === userId.toString()).completed) {
+                    completedTasks++;
+                }
+            });
+            const completionPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+        %>
+        <div id="taskCompletion" class="circular-progress" data-completed="<%= completedTasks %>" data-total="<%= totalTasks %>" style="--percentage: <%= completionPercentage * 3.6 %>deg;"></div>
+    </div>
+
+    <h2>Incomplete Tasks:</h2>
     <form action="/students/mark-tasks-complete" method="post">
         <input type="hidden" name="returnUrl" value="<%= req.originalUrl %>">
         <ul>
-            <% tasks.forEach(function(task) { %>
-                <li>
+            <% tasks.filter(task => !task.completions.find(c => c.student.toString() === userId.toString()).completed).forEach(function(task) { %>
+                <li class="task">
                     <strong>Description:</strong> <%= task.description %> - 
                     <strong>Due:</strong> <%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'No due date' %> -
                     <strong>Importance:</strong> <%= task.importance %> -
-                    <% if (task.completions.find(c => c.student.toString() === userId.toString()).completed) { %>
-                        <strong>Completed</strong>
-                    <% } else { %>
-                        <strong>Incomplete</strong>
-                        <label>
-                            <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
-                        </label>
-                    <% } %>
+                    <strong>Incomplete</strong>
+                    <label>
+                        <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
+                    </label>
                 </li>
             <% }); %>
         </ul>
+
+        <h2>Completed Tasks:</h2>
+        <ul>
+            <% tasks.filter(task => task.completions.find(c => c.student.toString() === userId.toString()).completed).forEach(function(task) { %>
+                <li class="task">
+                    <strong>Description:</strong> <%= task.description %> - 
+                    <strong>Due:</strong> <%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'No due date' %> -
+                    <strong>Importance:</strong> <%= task.importance %> -
+                    <strong>Completed</strong>
+                </li>
+            <% }); %>
+        </ul>
+
         <input type="hidden" name="classId" value="<%= classId %>">
         <button type="submit">Submit Changes</button>
     </form>
@@ -35,7 +89,6 @@
     <button onclick="window.location.href='/students/class-attendance-report/<%= classId %>'">View Attendance Report</button>
     <br>
     <br>
-    
     <button onclick="window.location.href='/students/student-dashboard'">Back to Dashboard</button>
 </body>
 </html>
