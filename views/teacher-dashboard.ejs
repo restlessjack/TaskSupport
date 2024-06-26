@@ -5,7 +5,10 @@
     <title>Teacher Dashboard</title>
 </head>
 <body>
-    <h1>Welcome <%= username %></h1> <!-- Display the username -->
+    <div class="wrapper">
+        <%- include('_navbar2', { userRole: userRole }) %>
+        <div class="main_container">
+            <h1>Welcome, <%= username %>!</h1> <!-- Display the username -->
     <nav>
         <ul>
             <li><a href="/teachers/view-classes">View Classes</a></li>
@@ -13,5 +16,7 @@
             <li><a href="/teachers/settings">Settings</a></li>
         </ul>
     </nav>
+    </div>
+    </div>
 </body>
 </html>
