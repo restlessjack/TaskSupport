@@ -1,16 +1,27 @@
+<!-- views/layout.ejs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard</title>
-    
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/navbar.css">
+    <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
+    <script src="/js/navbar.js"></script>
     <style>
         .new-notifications {
             color: red;
             font-weight: bold;
         }
     </style>
+</head>
+<body>
+    <div class="wrapper">
+        <%- include('_navbar', { userRole: userRole }) %>
+        <div class="main_container">
+            <%- body %>
+        </div>
+    </div>
     <script>
         async function checkNewNotifications() {
             try {
@@ -49,30 +60,5 @@
             checkNewNotifications();
         }
     </script>
-</head>
-<body>
-    <div class="wrapper">
-    <%- include('_navbar', { userRole: userRole }) %>
-    <div class="main_container">
-        <h1>Welcome, <%= username %>!</h1>
-        <nav>
-            <ul>
-                <li>Total Tasks Completed: <%= totalTaskCompletionPercentage %></li>
-                <li><a href="/students/student-classes">View Classes</a></li>
-                <li>
-                    <a href="/students/student-incomplete-tasks">View Incomplete Tasks</a>
-                    <span id="new-tasks-notification"></span>
-                </li>
-                <li>
-                    <a href="/students/student-notifications">View Notifications</a>
-                    <span id="new-notifications"></span>
-                </li>
-                <li><a href="/students/student-attendance-report">View Attendance Report</a></li>
-                <li><a href="/students/settings">Settings</a></li>
-                <li><a href="/users/logout">Logout</a></li>
-            </ul>
-        </nav>
-    </div>
-</div>
 </body>
 </html>
