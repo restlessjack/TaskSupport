@@ -75,6 +75,9 @@
     </script>
 </head>
 <body>
+    <div class="wrapper">
+        <%- include('_navbar', { userRole: userRole }) %>
+        <div class="main_container">
     <h1>Attendance Report</h1>
     <p>Average Attendance Percentage: <%= averageAttendancePercentage %> %</p>
     <h2>Attendance Over Time</h2>
@@ -82,5 +85,7 @@
         <canvas id="attendanceChart"></canvas>
     </div>
     <a href="/students/student-dashboard">Back to Dashboard</a>
+    </div>
+    </div>
 </body>
 </html>

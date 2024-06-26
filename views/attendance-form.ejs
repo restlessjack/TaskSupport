@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Record Attendance</title>
 </head>
+<div class="wrapper">
+    <%- include('_navbar2', { userRole: userRole }) %>
+    <div class="main_container">
 <body>
     <h1>Record Attendance for <%= classInfo.name %></h1>
     <form action="/attendances/attendance/<%= classInfo._id %>" method="post">
@@ -22,5 +25,7 @@
         <button type="submit">Submit Attendance</button>
     </form>
     
+</div>
+</div>
 </body>
 </html>

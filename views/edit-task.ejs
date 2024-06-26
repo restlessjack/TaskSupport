@@ -29,6 +29,9 @@
     </style>
 </head>
 <body>
+    <div class="wrapper">
+        <%- include('_navbar2', { userRole: userRole }) %>
+        <div class="main_container">
     <h1>Edit Task</h1>
     <form action="/teachers/edit-task/<%= task._id %>" method="post">
         <label for="description">Task Description:</label>
@@ -48,5 +51,8 @@
         <button type="submit">Update Task</button>
     </form>
     <button onclick="window.location.href='/teachers/manage-tasks/<%= task.class %>'">Back to Task Management</button>
+    </div>
+    </div>
 </body>
+
 </html>

@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Manage Tasks for <%= classInfo.name %></title>
+ 
     <style>
-        ul {
+        .task-container ul {
             list-style-type: none;
             padding: 0;
         }
-        li {
+        .task-container li {
             padding: 10px;
             margin-bottom: 5px;
             background-color: #f0f0f0;
             border-radius: 5px;
         }
-        a {
+        .task-container a {
             text-decoration: none;
             color: black;
         }
-        button {
+        .task-container button {
             cursor: pointer;
             padding: 10px 20px;
             margin-top: 20px;
@@ -28,10 +29,11 @@
             border-radius: 5px;
             font-size: 16px;
         }
-        button:hover {
+        .task-container button:hover {
             background-color: #0056b3;
         }
-        input, textarea {
+        .task-container input,
+        .task-container textarea {
             width: 95%;
             padding: 12px;
             margin: 8px 0;
@@ -43,32 +45,36 @@
     </style>
 </head>
 <body>
-    <h1>Manage Tasks for <%= classInfo.name %></h1>
+    <div class="wrapper">
+        <%- include('_navbar2', { userRole: userRole }) %>
+        <div class="main_container">
+            <div class="task-container">
+                <h1>Manage Tasks for <%= classInfo.name %></h1>
 
-    <h2>Existing Tasks</h2>
-    <ul>
-        <% if (classInfo.tasks && classInfo.tasks.length > 0) { %>
-            <% classInfo.tasks.forEach(function(task) { %>
-                <li>
-                    <%= task.description %>
-                    <form action="/teachers/delete-task/<%= task._id %>" method="post" style="display:inline;">
-                        <input type="hidden" name="classId" value="<%= classInfo._id %>">
-                        <button type="submit">Delete</button>
-                    </form>
-                    <form action="/teachers/edit-task/<%= task._id %>" method="get" style="display:inline;">
-                        <input type="hidden" name="classId" value="<%= classInfo._id %>">
-                        <button type="submit">Edit</button>
-                    </form>
-                </li>
-            <% }) %>
-        <% } else { %>
-            <li>No tasks assigned</li>
-        <% } %>
-    </ul>
+                <h2>Existing Tasks</h2>
+                <ul>
+                    <% if (classInfo.tasks && classInfo.tasks.length > 0) { %>
+                        <% classInfo.tasks.forEach(function(task) { %>
+                            <li>
+                                <%= task.description %>
+                                <form action="/teachers/delete-task/<%= task._id %>" method="post" style="display:inline;">
+                                    <input type="hidden" name="classId" value="<%= classInfo._id %>">
+                                    <button type="submit">Delete</button>
+                                </form>
+                                <form action="/teachers/edit-task/<%= task._id %>" method="get" style="display:inline;">
+                                    <input type="hidden" name="classId" value="<%= classInfo._id %>">
+                                    <button type="submit">Edit</button>
+                                </form>
+                            </li>
+                        <% }) %>
+                    <% } else { %>
+                        <li>No tasks assigned</li>
+                    <% } %>
+                </ul>
 
-    
-
-    <button onclick="window.location.href='/teachers/view-class/<%= classInfo._id %>'">Back to Class</button>
+                <button onclick="window.location.href='/teachers/view-class/<%= classInfo._id %>'">Back to Class</button>
+            </div>
+        </div>
+    </div>
 </body>
-
 </html>

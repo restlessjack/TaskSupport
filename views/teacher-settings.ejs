@@ -38,6 +38,9 @@
     </style>
 </head>
 <body>
+    <div class="wrapper">
+        <%- include('_navbar2', { userRole: userRole }) %>
+        <div class="main_container">
     <h1>Teacher Settings</h1>
 
     
@@ -61,5 +64,7 @@
             <%= message %>
         </div>
     <% } %>
+    </div>
+    </div>
 </body>
 </html>

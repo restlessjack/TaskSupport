@@ -4,26 +4,13 @@
     <meta charset="UTF-8">
     <title>View Classes</title>
     <style>
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            padding: 10px;
-            margin-bottom: 5px;
-            background-color: #f0f0f0;
-            border-radius: 5px;
-        }
-        a {
-            text-decoration: none;
-            color: black;
-        }
-        button {
-            cursor: pointer;
-        }
+        
     </style>
 </head>
 <body>
+    <div class="wrapper">
+        <%- include('_navbar2', { userRole: userRole }) %>
+        <div class="main_container">
     <h1>Your Classes</h1>
     <ul>
         <% classes.forEach(function(cls) { %>
@@ -35,5 +22,7 @@
     </ul>
     <button onclick="location.href='/teachers/create'">Add New Class</button> <!-- Button to add a new class -->
     <button onclick="location.href='/teachers/dashboard'">Back</button>
+    </div>
+    </div>
 </body>
 </html>

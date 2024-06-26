@@ -23,6 +23,9 @@
     </style>
 </head>
 <body>
+    <div class="wrapper">
+        <%- include('_navbar', { userRole: userRole }) %>
+        <div class="main_container">
     <h1>Notifications</h1>
     <form action="/students/notifications/mark" method="post">
         <% notifications.forEach(function(notification) { %>
@@ -60,6 +63,9 @@
             }
         });
         </script>
+
+</div>
+</div>
 </body>
 </html>
 

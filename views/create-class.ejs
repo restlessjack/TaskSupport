@@ -17,6 +17,9 @@
     </style>
 </head>
 <body>
+    <div class="wrapper">
+        <%- include('_navbar2', { userRole: userRole }) %>
+        <div class="main_container">
     <h1>Create a New Class</h1>
     <form id="classForm">
         <label for="name">Class Name:</label>
@@ -28,7 +31,7 @@
         
         <button type="submit" onclick="submitForm(event)">Create Class</button>
     </form>
-    <button onclick="window.location.href='/view-classes'">Cancel</button>
+    <button onclick="window.location.href='/teachers/view-classes'">Cancel</button>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -87,5 +90,7 @@
 
 
     </script>
+    </div>
+    </div>
 </body>
 </html>

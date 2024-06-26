@@ -3,22 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Class Details</title>
+    <link rel="stylesheet" href="/css/navbar.css">
+    <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
+    <script src="/js/navbar.js"></script>
     <style>
-        ul {
+        .class-container ul {
             list-style-type: none;
             padding: 0;
         }
-        li {
+        .class-container li {
             padding: 10px;
             margin-bottom: 5px;
             background-color: #f0f0f0;
             border-radius: 5px;
         }
-        a {
+        .class-container a {
             text-decoration: none;
             color: black;
         }
-        button, .add-field {
+        .class-container button, .class-container .add-field {
             cursor: pointer;
             padding: 10px 20px;
             margin-top: 20px;
@@ -28,10 +31,10 @@
             border-radius: 5px;
             font-size: 16px;
         }
-        button:hover, .add-field:hover {
+        .class-container button:hover, .class-container .add-field:hover {
             background-color: #0056b3;
         }
-        input, textarea, select {
+        .class-container input, .class-container textarea, .class-container select {
             width: 95%;
             padding: 12px;
             margin: 8px 0;
@@ -40,22 +43,19 @@
             border-radius: 4px;
             box-sizing: border-box;
         }
-        .hidden {
+        .class-container .hidden {
             display: none;
         }
-        /* Style for the chart container */
-        .chart-container {
-            width: 600px; /* Adjust as needed */
-            height: 400px; /* Adjust as needed */
-            margin: auto; /* Center the chart */
+        .class-container .chart-container {
+            width: 600px;
+            height: 400px;
+            margin: auto;
         }
-        canvas {
-            display: block; /* Prevent extra space below canvas */
+        .class-container canvas {
+            display: block;
         }
     </style>
-    <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Include the date adapter for Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <script>
         function toggleField(fieldId, addButtonId, removeButtonId) {
@@ -69,12 +69,9 @@
         }
 
         async function fetchAttendanceData() {
-            console.log('Fetching attendance data...');
             const response = await fetch('/attendances/attendance-data/<%= classInfo._id %>');
             if (response.ok) {
-                const data = await response.json();
-                console.log('Fetched Attendance Data:', data); // Log the fetched data
-                return data;
+                return await response.json();
             } else {
                 console.error('Failed to fetch attendance data:', response.statusText);
                 return [];
@@ -83,7 +80,6 @@
 
         async function renderChart() {
             const data = await fetchAttendanceData();
-            console.log('Data for Chart:', data);
 
             const labels = data.map(record => record.date);
             const attendancePercentages = data.map(record => {
@@ -91,11 +87,8 @@
                 return (record.presentCount / total) * 100;
             });
 
-            console.log('Labels:', labels);
-            console.log('Attendance Percentages:', attendancePercentages);
-
             const ctx = document.getElementById('attendanceChart').getContext('2d');
-            const chart = new Chart(ctx, {
+            new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
@@ -129,58 +122,63 @@
     </script>
 </head>
 <body>
-    <h1>Class: <%= classInfo.name %></h1>
-    <h2>Total Attendance Percentage: <%= totalAttendancePercentage.toFixed(2) %> %</h2>
-    <h2>Attendance Over Time</h2>
-    <div class="chart-container">
-        <canvas id="attendanceChart"></canvas>
+    <div class="wrapper">
+        <%- include('_navbar2', { userRole: userRole }) %>
+        <div class="main_container">
+            <div class="class-container">
+                <h1>Class: <%= classInfo.name %></h1>
+                <h2>Total Attendance Percentage: <%= totalAttendancePercentage.toFixed(2) %> %</h2>
+                <h2>Attendance Over Time</h2>
+                <div class="chart-container">
+                    <canvas id="attendanceChart"></canvas>
+                </div>
+                <h2>Student List:</h2>
+                <ul>
+                    <% if (studentAttendancePercentages && studentAttendancePercentages.length > 0) { %>
+                        <% studentAttendancePercentages.forEach(function(student) { %>
+                            <li><%= student.username %> - Attendance: <%= student.attendancePercentage.toFixed(2) %> %</li>
+                        <% }) %>
+                    <% } else { %>
+                        <li>No students assigned</li>
+                    <% } %>
+                </ul>
+                <ul>
+                    <form action="/attendances/attendance/<%= classInfo._id %>" method="get">
+                        <button type="submit">Create Attendance Report</button>
+                    </form>
+                </ul>
+
+                <!-- Form to add a new task -->
+                <form action="/teachers/create-task/<%= classInfo._id %>" method="post">
+                    <label for="description">Task Description:</label>
+                    <textarea id="description" name="description" required></textarea>
+                    
+                    <div id="importance-field" class="hidden">
+                        <label for="importance">Importance:</label>
+                        <select id="importance" name="importance">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                        <button type="button" id="remove-importance" class="hidden" onclick="toggleField('importance-field', 'add-importance', 'remove-importance')">- Remove Importance</button>
+                    </div>
+                    <button type="button" id="add-importance" class="add-field" onclick="toggleField('importance-field', 'add-importance', 'remove-importance')">+ Add Importance</button>
+
+                    <div id="duedate-field" class="hidden">
+                        <label for="optionalDueDate">Due Date:</label>
+                        <input type="date" id="optionalDueDate" name="optionalDueDate">
+                        <button type="button" id="remove-duedate" class="hidden" onclick="toggleField('duedate-field', 'add-duedate', 'remove-duedate')">- Remove Due Date</button>
+                    </div>
+                    <button type="button" id="add-duedate" class="add-field" onclick="toggleField('duedate-field', 'add-duedate', 'remove-duedate')">+ Add Due Date</button>
+
+                    <button type="submit">Add Task</button>
+                </form>
+                <form action="/teachers/manage-tasks/<%= classInfo._id %>" method="get">
+                    <button type="submit">Manage Tasks</button>
+                </form>
+                <a href="/teachers/view-classes">Back to Classes</a>
+            </div>
+        </div>
     </div>
-    <h2>Student List:</h2>
-    <ul>
-        <% if (studentAttendancePercentages && studentAttendancePercentages.length > 0) { %>
-            <% studentAttendancePercentages.forEach(function(student) { %>
-                <li><%= student.username %> - Attendance: <%= student.attendancePercentage.toFixed(2) %> %</li>
-            <% }) %>
-        <% } else { %>
-            <li>No students assigned</li>
-        <% } %>
-    </ul>
-    <ul>
-    <form action="/attendances/attendance/<%= classInfo._id %>" method="get">
-        <button type="submit">Create Attendance Report</button>
-    </form>
-    </ul>
-
-    
-
-    <!-- Form to add a new task -->
-    <form action="/teachers/create-task/<%= classInfo._id %>" method="post">
-        <label for="description">Task Description:</label>
-        <textarea id="description" name="description" required></textarea>
-        
-        <div id="importance-field" class="hidden">
-            <label for="importance">Importance:</label>
-            <select id="importance" name="importance">
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-            </select>
-            <button type="button" id="remove-importance" class="hidden" onclick="toggleField('importance-field', 'add-importance', 'remove-importance')">- Remove Importance</button>
-        </div>
-        <button type="button" id="add-importance" class="add-field" onclick="toggleField('importance-field', 'add-importance', 'remove-importance')">+ Add Importance</button>
-
-        <div id="duedate-field" class="hidden">
-            <label for="optionalDueDate">Due Date:</label>
-            <input type="date" id="optionalDueDate" name="optionalDueDate">
-            <button type="button" id="remove-duedate" class="hidden" onclick="toggleField('duedate-field', 'add-duedate', 'remove-duedate')">- Remove Due Date</button>
-        </div>
-        <button type="button" id="add-duedate" class="add-field" onclick="toggleField('duedate-field', 'add-duedate', 'remove-duedate')">+ Add Due Date</button>
-
-        <button type="submit">Add Task</button>
-    </form>
-    <form action="/teachers/manage-tasks/<%= classInfo._id %>" method="get">
-        <button type="submit">Manage Tasks</button>
-    </form>
-    <a href="/teachers/view-classes">Back to Classes</a>
 </body>
 </html>
