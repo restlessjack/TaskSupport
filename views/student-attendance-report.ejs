@@ -3,19 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <title>Attendance Report</title>
+    <link rel="stylesheet" href="/css/navbar.css">
+    <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
+    <script src="/js/navbar.js"></script>
     <style>
         .chart-container {
-            width: 600px; /* Adjust as needed */
-            height: 400px; /* Adjust as needed */
-            margin: auto; /* Center the chart */
+            width: 100%; /* Make the container responsive */
+            max-width: 600px; /* Set a max-width for better presentation */
+            height: auto; /* Adjust height to content */
+            margin: 20px auto; /* Center the chart and add margin */
+            background-color: #fff; /* Add white background */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         canvas {
-            display: block; /* Prevent extra space below canvas */
+            display: block;
+            width: 100%; /* Make canvas responsive */
+            height: auto; /* Adjust height to content */
+        }
+        .content-container {
+            margin: 20px 0;
+        }
+        .content-container p {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        .content-container h1, .content-container h2 {
+            margin: 20px 0;
+        }
+        .content-container a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #2e4ead;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .content-container a:hover {
+            background-color: #4360b5;
         }
     </style>
-    <!-- Include Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Include the date adapter for Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <script>
         async function fetchAttendanceData() {
@@ -36,7 +66,7 @@
             const cumulativePercentages = data.map(record => record.cumulativePercentage);
 
             const ctx = document.getElementById('attendanceChart').getContext('2d');
-            const chart = new Chart(ctx, {
+            new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
@@ -78,14 +108,16 @@
     <div class="wrapper">
         <%- include('_navbar', { userRole: userRole }) %>
         <div class="main_container">
-    <h1>Attendance Report</h1>
-    <p>Average Attendance Percentage: <%= averageAttendancePercentage %> %</p>
-    <h2>Attendance Over Time</h2>
-    <div class="chart-container">
-        <canvas id="attendanceChart"></canvas>
-    </div>
-    <a href="/students/student-dashboard">Back to Dashboard</a>
-    </div>
+            <div class="content-container">
+                
+                <h2>Attendance Over Time:</h2>
+                <div class="chart-container">
+                    <canvas id="attendanceChart"></canvas>
+                </div>
+                <p>Average Attendance Percentage: <b> <%= averageAttendancePercentage %> %</b></p>
+                <a href="/students/student-dashboard">Back to Dashboard</a>
+            </div>
+        </div>
     </div>
 </body>
 </html>

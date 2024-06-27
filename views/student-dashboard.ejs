@@ -10,6 +10,25 @@
             color: red;
             font-weight: bold;
         }
+        .circular-progress {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            background: conic-gradient(#4caf50 var(--percentage), #ddd var(--percentage));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px; /* Add margin to the right */
+            float: left; /* Float to the left */
+        }
+
+        .circular-progress::before {
+            content: attr(data-percentage) '%';
+            position: absolute;
+            font-size: 20px;
+            color: #333;
+        }
     </style>
     <script>
         async function checkNewNotifications() {
@@ -52,16 +71,19 @@
 </head>
 <body>
     <div class="wrapper">
-    <%- include('_navbar', { userRole: userRole }) %>
-    <div class="main_container">
-        <h1>Welcome, <%= username %>!</h1>
-        <nav>
-            <ul>
-                <li>Total Tasks Completed: <%= totalTaskCompletionPercentage %></li>
-                
-            </ul>
-        </nav>
+        <%- include('_navbar', { userRole: userRole }) %>
+        <div class="main_container">
+            <h1>Welcome, <%= username %>!</h1>
+            <nav>
+                <ul>
+                    <% const totalTasks = totalTaskCompletionPercentage; %>
+                    <% const completedTasks = Math.round(totalTasks * totalTaskCompletionPercentage / 100); %>
+                    <li> Total Tasks Completed:</li>
+                    <div id="taskCompletion" class="circular-progress" data-percentage="<%= totalTaskCompletionPercentage %>" style="--percentage: <%= totalTaskCompletionPercentage * 3.6 %>deg;"></div>
+                    
+                </ul>
+            </nav>
+        </div>
     </div>
-</div>
 </body>
 </html>

@@ -3,26 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <title>View Classes</title>
+    <link rel="stylesheet" href="/css/navbar.css">
     <style>
-        
+        .class-list {
+            margin: 20px 0;
+        }
+        .class-item {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .class-item a {
+            text-decoration: none;
+            color: #2e4ead;
+            font-weight: bold;
+        }
+        .class-item a:hover {
+            text-decoration: underline;
+        }
+        .class-item button {
+            background-color: #2e4ead;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .class-item button:hover {
+            background-color: #4360b5;
+        }
+        button {
+            background-color: #2e4ead;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #4360b5;
+        }
     </style>
 </head>
 <body>
     <div class="wrapper">
         <%- include('_navbar2', { userRole: userRole }) %>
         <div class="main_container">
-    <h1>Your Classes</h1>
-    <ul>
-        <% classes.forEach(function(cls) { %>
-            <li>
-                <a href="/teachers/view-class/<%= cls._id %>"><%= cls.name %></a> <!-- Link to view class details and tasks -->
-                <a href="/teachers/edit-class/<%= cls._id %>" style="margin-left: 20px;">Edit</a>
-            </li>
-        <% }) %>
-    </ul>
-    <button onclick="location.href='/teachers/create'">Add New Class</button> <!-- Button to add a new class -->
-    <button onclick="location.href='/teachers/dashboard'">Back</button>
-    </div>
+            <h1>Your Classes</h1>
+            <div class="class-list">
+                <% classes.forEach(function(cls) { %>
+                    <div class="class-item">
+                        <a href="/teachers/view-class/<%= cls._id %>"><%= cls.name %></a>
+                        <div>
+                            <a href="/teachers/edit-class/<%= cls._id %>"><button>Edit</button></a>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+            <button onclick="location.href='/teachers/create'">Add New Class</button>
+            <button onclick="location.href='/teachers/dashboard'">Back</button>
+        </div>
     </div>
 </body>
 </html>

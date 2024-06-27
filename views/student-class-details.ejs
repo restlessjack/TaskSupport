@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Details</title>
+    <link rel="stylesheet" href="/css/navbar.css">
     <style>
         .task {
-            border: 2px solid #ddd;
-            padding: 10px;
+            background: #fff;
+            padding: 15px;
             margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         .circular-progress {
             position: relative;
@@ -19,19 +21,29 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 20px; /* Add margin to the right */
-            float: left; /* Float to the left */
+            margin-right: 20px;
+            float: left;
         }
-
         .circular-progress::before {
             content: attr(data-completed) '/' attr(data-total);
             position: absolute;
             font-size: 20px;
             color: #333;
         }
-
         .task-list {
-            overflow: hidden; /* Clear floats */
+            overflow: hidden;
+        }
+        button {
+            background-color: #2e4ead;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #4360b5;
         }
     </style>
 </head>
@@ -39,61 +51,59 @@
     <div class="wrapper">
         <%- include('_navbar', { userRole: userRole }) %>
         <div class="main_container">
-    <h1>Class: <%= className %></h1>
+            <h1>Class: <%= className %></h1>
 
-    <div class="task-list">
-        <h2>Tasks Completion</h2>
-        <%
-            let completedTasks = 0;
-            let totalTasks = tasks.length;
-            tasks.forEach(task => {
-                if (task.completions.find(c => c.student.toString() === userId.toString()).completed) {
-                    completedTasks++;
-                }
-            });
-            const completionPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-        %>
-        <div id="taskCompletion" class="circular-progress" data-completed="<%= completedTasks %>" data-total="<%= totalTasks %>" style="--percentage: <%= completionPercentage * 3.6 %>deg;"></div>
-    </div>
+            <div class="task-list">
+                <h2>Tasks Completion</h2>
+                <%
+                    let completedTasks = 0;
+                    let totalTasks = tasks.length;
+                    tasks.forEach(task => {
+                        if (task.completions.find(c => c.student.toString() === userId.toString()).completed) {
+                            completedTasks++;
+                        }
+                    });
+                    const completionPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+                %>
+                <div id="taskCompletion" class="circular-progress" data-completed="<%= completedTasks %>" data-total="<%= totalTasks %>" style="--percentage: <%= completionPercentage * 3.6 %>deg;"></div>
+            </div>
 
-    <h2>Incomplete Tasks:</h2>
-    <form action="/students/mark-tasks-complete" method="post">
-        <input type="hidden" name="returnUrl" value="<%= req.originalUrl %>">
-        <ul>
-            <% tasks.filter(task => !task.completions.find(c => c.student.toString() === userId.toString()).completed).forEach(function(task) { %>
-                <li class="task">
-                    <strong>Description:</strong> <%= task.description %> - 
-                    <strong>Due:</strong> <%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'No due date' %> -
-                    <strong>Importance:</strong> <%= task.importance %>
-                   
-                    <label>
-                        <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
-                    </label>
-                </li>
-            <% }); %>
-        </ul>
+            <h2>Incomplete Tasks:</h2>
+            <form action="/students/mark-tasks-complete" method="post">
+                <input type="hidden" name="returnUrl" value="<%= req.originalUrl %>">
+                <ul>
+                    <% tasks.filter(task => !task.completions.find(c => c.student.toString() === userId.toString()).completed).forEach(function(task) { %>
+                        <li class="task">
+                            <strong>Description:</strong> <%= task.description %> - 
+                            <strong>Due:</strong> <%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'No due date' %> -
+                            <strong>Importance:</strong> <%= task.importance %>
+                            <label>
+                                <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
+                            </label>
+                        </li>
+                    <% }); %>
+                </ul>
 
-        <h2>Completed Tasks:</h2>
-        <ul>
-            <% tasks.filter(task => task.completions.find(c => c.student.toString() === userId.toString()).completed).forEach(function(task) { %>
-                <li class="task">
-                    <strong>Description:</strong> <%= task.description %> - 
-                    <strong>Due:</strong> <%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'No due date' %> -
-                    <strong>Importance:</strong> <%= task.importance %>
-                  
-                </li>
-            <% }); %>
-        </ul>
+                <h2>Completed Tasks:</h2>
+                <ul>
+                    <% tasks.filter(task => task.completions.find(c => c.student.toString() === userId.toString()).completed).forEach(function(task) { %>
+                        <li class="task">
+                            <strong>Description:</strong> <%= task.description %> - 
+                            <strong>Due:</strong> <%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'No due date' %> -
+                            <strong>Importance:</strong> <%= task.importance %>
+                        </li>
+                    <% }); %>
+                </ul>
 
-        <input type="hidden" name="classId" value="<%= classId %>">
-        <button type="submit">Submit Changes</button>
-    </form>
-    <br>
-    <button onclick="window.location.href='/students/class-attendance-report/<%= classId %>'">View Attendance Report</button>
-    <br>
-    <br>
-    <button onclick="window.location.href='/students/student-dashboard'">Back to Dashboard</button>
-    </div>
+                <input type="hidden" name="classId" value="<%= classId %>">
+                <button type="submit">Submit Changes</button>
+            </form>
+            <br>
+            <button onclick="window.location.href='/students/class-attendance-report/<%= classId %>'">View Attendance Report</button>
+            <br>
+            <br>
+            <button onclick="window.location.href='/students/student-dashboard'">Back to Dashboard</button>
+        </div>
     </div>
 </body>
 </html>

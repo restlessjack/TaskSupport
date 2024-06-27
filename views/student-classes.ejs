@@ -4,19 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Classes</title>
+    <link rel="stylesheet" href="/css/navbar.css">
+    <style>
+        .class-list {
+            margin: 20px 0;
+        }
+        .class-item {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .class-item a {
+            text-decoration: none;
+            color: #2e4ead;
+            font-weight: bold;
+        }
+        .class-item a:hover {
+            text-decoration: underline;
+        }
+        button {
+            background-color: #2e4ead;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #4360b5;
+        }
+    </style>
 </head>
 <body>
     <div class="wrapper">
         <%- include('_navbar', { userRole: userRole }) %>
         <div class="main_container">
-    
-    <h1>Your Classes:</h1>
-    <ul>
-        <% classes.forEach(function(cl) { %>
-            <li><a href="/students/student-class-details/<%= cl._id %>"><%= cl.name %> - Taught by <%= cl.teacher.username %></a></li>
-        <% }); %>
-    </ul>
-    </div>
+            <h1>Your Classes:</h1>
+            <div class="class-list">
+                <% classes.forEach(function(cl) { %>
+                    <div class="class-item">
+                        <a href="/students/student-class-details/<%= cl._id %>"><%= cl.name %> - Taught by <%= cl.teacher.username %></a>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
     </div>
 </body>
 </html>
