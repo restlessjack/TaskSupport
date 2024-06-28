@@ -3,8 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Manage Tasks for <%= classInfo.name %></title>
- 
+    <link rel="stylesheet" href="/css/navbar.css">
     <style>
+        .task-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+        }
+        .task-container h1, .task-container h2 {
+            color: #2e4ead;
+        }
         .task-container ul {
             list-style-type: none;
             padding: 0;
@@ -15,32 +25,34 @@
             background-color: #f0f0f0;
             border-radius: 5px;
         }
-        .task-container a {
-            text-decoration: none;
-            color: black;
+        .task-container li form {
+            display: inline;
         }
-        .task-container button {
+        .task-container li button {
             cursor: pointer;
-            padding: 10px 20px;
-            margin-top: 20px;
+            padding: 5px 10px;
+            margin-left: 10px;
             border: none;
             background-color: #007BFF;
             color: white;
             border-radius: 5px;
-            font-size: 16px;
+            font-size: 14px;
         }
-        .task-container button:hover {
+        .task-container li button:hover {
             background-color: #0056b3;
         }
-        .task-container input,
-        .task-container textarea {
-            width: 95%;
-            padding: 12px;
-            margin: 8px 0;
-            display: inline-block;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
+        .task-container button.back-button {
+            cursor: pointer;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border: none;
+            background-color: #2e4ead;
+            color: white;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .task-container button.back-button:hover {
+            background-color: #4360b5;
         }
     </style>
 </head>
@@ -57,11 +69,11 @@
                         <% classInfo.tasks.forEach(function(task) { %>
                             <li>
                                 <%= task.description %>
-                                <form action="/teachers/delete-task/<%= task._id %>" method="post" style="display:inline;">
+                                <form action="/teachers/delete-task/<%= task._id %>" method="post">
                                     <input type="hidden" name="classId" value="<%= classInfo._id %>">
                                     <button type="submit">Delete</button>
                                 </form>
-                                <form action="/teachers/edit-task/<%= task._id %>" method="get" style="display:inline;">
+                                <form action="/teachers/edit-task/<%= task._id %>" method="get">
                                     <input type="hidden" name="classId" value="<%= classInfo._id %>">
                                     <button type="submit">Edit</button>
                                 </form>
@@ -72,7 +84,7 @@
                     <% } %>
                 </ul>
 
-                <button onclick="window.location.href='/teachers/view-class/<%= classInfo._id %>'">Back to Class</button>
+                <button class="back-button" onclick="window.location.href='/teachers/view-class/<%= classInfo._id %>'">Back to Class</button>
             </div>
         </div>
     </div>

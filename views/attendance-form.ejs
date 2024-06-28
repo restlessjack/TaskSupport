@@ -3,29 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <title>Record Attendance</title>
+    <link rel="stylesheet" href="/css/navbar.css">
+    <style>
+        .attendance-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+        }
+        .attendance-container h1 {
+            color: #2e4ead;
+            margin-bottom: 20px;
+        }
+        .attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .attendance-table th, .attendance-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        .attendance-table th {
+            background-color: #f2f2f2;
+        }
+        .attendance-table td {
+            background-color: #fff;
+        }
+        .attendance-table input[type="checkbox"] {
+            margin: 0 10px;
+        }
+        .attendance-table td:first-child {
+            font-weight: 600;
+        }
+        .submit-button {
+            cursor: pointer;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border: none;
+            background-color: #2e4ead;
+            color: white;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .submit-button:hover {
+            background-color: #4360b5;
+        }
+    </style>
+    <script>
+        function toggleCheckbox(checkbox, otherCheckboxId) {
+            document.getElementById(otherCheckboxId).checked = !checkbox.checked;
+        }
+    </script>
 </head>
-<div class="wrapper">
-    <%- include('_navbar2', { userRole: userRole }) %>
-    <div class="main_container">
 <body>
-    <h1>Record Attendance for <%= classInfo.name %></h1>
-    <form action="/attendances/attendance/<%= classInfo._id %>" method="post">
-        <ul>
-            <% classInfo.students.forEach((student, index) => { %>
-                <li>
-                    <%= student.username %>: 
-                    <select name="attendance[<%= index %>][status]" required>
-                        <option value="Present">Present</option>
-                        <option value="Absent">Absent</option>
-                    </select>
-                    <input type="hidden" name="attendance[<%= index %>][student]" value="<%= student._id %>" />
-                </li>
-            <% }) %>
-        </ul>
-        <button type="submit">Submit Attendance</button>
-    </form>
-    
-</div>
-</div>
+    <div class="wrapper">
+        <%- include('_navbar2', { userRole: userRole }) %>
+        <div class="main_container">
+            <div class="attendance-container">
+                <h1>Record Attendance for <%= classInfo.name %></h1>
+                <form action="/attendances/attendance/<%= classInfo._id %>" method="post">
+                    <table class="attendance-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Present</th>
+                                <th>Absent</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% classInfo.students.forEach((student, index) => { %>
+                                <tr>
+                                    <td><%= student.username %></td>
+                                    <td>
+                                        <input type="checkbox" name="attendance[<%= index %>][status]" value="Present" id="present-<%= index %>" checked onclick="toggleCheckbox(this, 'absent-<%= index %>')">
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" name="attendance[<%= index %>][status]" value="Absent" id="absent-<%= index %>" onclick="toggleCheckbox(this, 'present-<%= index %>')">
+                                    </td>
+                                    <input type="hidden" name="attendance[<%= index %>][student]" value="<%= student._id %>">
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                    <button type="submit" class="submit-button">Submit Attendance</button>
+                    
+                </form>
+                <button class="back-button"onclick="window.location.href='/teachers/view-class/<%= classInfo._id %>'">Back to Class</button>
+            </div>
+            
+        </div>
+    </div>
 </body>
 </html>

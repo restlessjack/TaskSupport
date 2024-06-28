@@ -3,60 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <title>Edit Class</title>
+    <link rel="stylesheet" href="/css/navbar.css">
     <style>
-        label, input, button {
-            display: block;
-            margin-top: 10px;
+        .edit-class-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
         }
-        input, button {
-            margin-bottom: 10px;
+        .edit-class-container h1 {
+            color: #2e4ead;
         }
-        .student-entry {
-            margin-bottom: 5px;
+        .student-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .student-table th, .student-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        .student-table th {
+            background-color: #f2f2f2;
+        }
+        .student-table td {
+            background-color: #fff;
+        }
+        .student-table button {
+            cursor: pointer;
+            padding: 5px 10px;
+            border: none;
+            background-color: #ff4d4d;
+            color: white;
+            border-radius: 5px;
+        }
+        .student-table button:hover {
+            background-color: #cc0000;
+        }
+        .add-student-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .add-student-container input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .add-student-container button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #2e4ead;
+            color: white;
+            border-radius: 5px;
+        }
+        .add-student-container button:hover {
+            background-color: #4360b5;
+        }
+        .form-buttons {
+            margin-top: 20px;
+        }
+        .form-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .form-buttons .submit-button {
+            background-color: #2e4ead;
+            color: white;
+        }
+        .form-buttons .submit-button:hover {
+            background-color: #4360b5;
+        }
+        .form-buttons .cancel-button {
+            background-color: #ccc;
+            color: #333;
+        }
+        .form-buttons .cancel-button:hover {
+            background-color: #aaa;
         }
     </style>
+    <script>
+        function addStudent() {
+            const studentList = document.getElementById('studentList');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" name="students[]" required></td>
+                <td><button type="button" onclick="removeStudent(this)">Remove</button></td>
+            `;
+            studentList.appendChild(row);
+        }
+
+        function removeStudent(button) {
+            button.closest('tr').remove();
+        }
+
+        function addNewStudent() {
+            const newStudentInput = document.getElementById('newStudent');
+            const newStudentUsername = newStudentInput.value.trim();
+            if (newStudentUsername) {
+                const studentList = document.getElementById('studentList');
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        ${newStudentUsername}
+                        <input type="hidden" name="students[]" value="${newStudentUsername}" required>
+                    </td>
+                    <td><button type="button" onclick="removeStudent(this)">Remove</button></td>
+                `;
+                studentList.appendChild(row);
+                newStudentInput.value = ''; // Clear the input field
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="wrapper">
         <%- include('_navbar2', { userRole: userRole }) %>
         <div class="main_container">
-    <h1>Edit Class: <%= classInfo.name %></h1>
-    <form id="classForm" method="post" action="/teachers/edit-class/<%= classInfo._id %>">
-        <label for="name">Class Name:</label>
-        <input type="text" id="name" name="name" value="<%= classInfo.name %>" required>
-        
-        <label>Students (by username):</label>
-        <div id="studentList">
-            <% classInfo.students.forEach(function(student) { %>
-                <div class="student-entry">
-                    <input type="text" name="students[]" value="<%= student.username %>" required>
-                    <button type="button" onclick="removeStudent(this)">Remove</button>
-                </div>
-            <% }); %>
+            <div class="edit-class-container">
+                <h1>Edit Class: <%= classInfo.name %></h1>
+                <form id="classForm" method="post" action="/teachers/edit-class/<%= classInfo._id %>">
+                    <label for="name">Class Name:</label>
+                    <input type="text" id="name" name="name" value="<%= classInfo.name %>" required>
+                    
+                    <label>Students (by username):</label>
+                    <table class="student-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentList">
+                            <% classInfo.students.forEach(function(student) { %>
+                                <tr>
+                                    <td>
+                                        <%= student.username %>
+                                        <input type="hidden" name="students[]" value="<%= student.username %>" required>
+                                    </td>
+                                    <td><button type="button" onclick="removeStudent(this)">Remove</button></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                    
+                    <div class="add-student-container">
+                        <input type="text" id="newStudent" placeholder="Enter username">
+                        <button type="button" onclick="addNewStudent()">Add Student</button>
+                    </div>
+
+                    <div class="form-buttons">
+                        <button type="submit" class="submit-button">Update Class</button>
+                        <button type="button" class="cancel-button" onclick="window.location.href='/teachers/view-classes'">Cancel</button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <button type="button" onclick="addStudent()">Add Student</button>
-        
-        <button type="submit">Update Class</button>
-    </form>
-    <button onclick="window.location.href='/teachers/view-classes'">Cancel</button>
-
-    <script>
-        function addStudent() {
-            const studentList = document.getElementById('studentList');
-            const inputDiv = document.createElement('div');
-            inputDiv.className = 'student-entry';
-            inputDiv.innerHTML = `
-                <input type="text" name="students[]" required>
-                <button type="button" onclick="removeStudent(this)">Remove</button>
-            `;
-            studentList.appendChild(inputDiv);
-        }
-
-        function removeStudent(button) {
-            button.parentNode.remove();
-        }
-    </script>
-    </div>
     </div>
 </body>
 </html>
