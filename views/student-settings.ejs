@@ -3,27 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <title>Student Settings</title>
+    <link rel="stylesheet" href="/css/navbar.css">
     <style>
-        input, button {
-            padding: 10px;
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #e1ecf2;
+            margin: 0;
+            padding: 0;
+        }
+        .wrapper {
             margin: 10px;
+        }
+        .main_container {
+            margin-top: 70px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #2e4ead;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #333;
+        }
+        input[type="number"],
+        input[type="password"] {
+            padding: 10px;
+            margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 4px;
             width: 100%;
+            max-width: 400px; /* Set a max-width for input fields */
+            box-sizing: border-box;
         }
         button {
-            background-color: #007BFF;
+            background-color: #2e4ead;
             color: white;
+            padding: 10px 20px;
             border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+            max-width: 400px; /* Set a max-width for buttons */
+            box-sizing: border-box;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #4360b5;
         }
         .message {
             padding: 10px;
-            margin: 10px;
+            margin: 10px 0;
             border-radius: 4px;
-            width: 100%;
+            width: calc(100% - 22px); /* Adjusted for padding */
+            box-sizing: border-box;
         }
         .success {
             background-color: #d4edda;
@@ -35,45 +73,54 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+        .section-spacing {
+            margin-bottom: 30px; /* Add space between sections */
+        }
     </style>
 </head>
 <body>
     <div class="wrapper">
         <%- include('_navbar', { userRole: userRole }) %>
         <div class="main_container">
-    <h1>Settings</h1>
+            <h1>Settings</h1>
 
-    <form action="/students/settings" method="post">
-        <label for="attendanceThreshold">Attendance Notification Threshold (%)</label>
-        <input type="number" id="attendanceThreshold" name="attendanceThreshold" value="<%= settings.attendanceThreshold %>" required>
+            <div class="section-spacing">
+                <form action="/students/settings" method="post">
+                    <label for="attendanceThreshold">Attendance Notification Threshold (%)</label>
+                    <input type="number" id="attendanceThreshold" name="attendanceThreshold" value="<%= settings.attendanceThreshold %>" required>
 
-        <label for="dueDateNotificationDays">Days Before Due Date for Notification</label>
-        <input type="number" id="dueDateNotificationDays" name="dueDateNotificationDays" value="<%= settings.dueDateNotificationDays %>" required>
-        
-        <button type="submit">Save Settings</button>
-    </form>
-    <button onclick="window.location.href='/students/student-dashboard'">Back to Dashboard</button>
-    
-    <h2>Change Password</h2>
-    <form action="/students/change-password" method="post">
-        <label for="oldPassword">Old Password</label>
-        <input type="password" id="oldPassword" name="oldPassword" required>
+                    <label for="dueDateNotificationDays">Days Before Due Date for Notification</label>
+                    <input type="number" id="dueDateNotificationDays" name="dueDateNotificationDays" value="<%= settings.dueDateNotificationDays %>" required>
+                    
+                    <button type="submit">Save Settings</button>
+                </form>
+            </div>
 
-        <label for="newPassword">New Password</label>
-        <input type="password" id="newPassword" name="newPassword" required>
+            <div class="section-spacing">
+                <h2>Change Password</h2>
+                <br>
+                <form action="/students/change-password" method="post">
+                    <label for="oldPassword">Old Password</label>
+                    <input type="password" id="oldPassword" name="oldPassword" required>
 
-        <label for="confirmPassword">Confirm New Password</label>
-        <input type="password" id="confirmPassword" name="confirmPassword" required>
-        
-        <button type="submit">Change Password</button>
-    </form>
-    
-    <% if (message) { %>
-        <div class="message <%= messageType %>">
-            <%= message %>
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" name="newPassword" required>
+
+                    <label for="confirmPassword">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    
+                    <button type="submit">Change Password</button>
+                </form>
+            </div>
+            
+            <% if (message) { %>
+                <div class="message <%= messageType %>">
+                    <%= message %>
+                </div>
+            <% } %>
+
+            <button onclick="window.location.href='/students/student-dashboard'">Back to Dashboard</button>
         </div>
-    <% } %>
-    </div>
     </div>
 </body>
 </html>

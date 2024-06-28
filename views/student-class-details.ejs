@@ -23,6 +23,7 @@
             justify-content: center;
             margin-right: 20px;
             float: left;
+            z-index: 1; /* Adjust z-index to be lower than taskbar */
         }
         .circular-progress::before {
             content: attr(data-completed) '/' attr(data-total);
@@ -44,6 +45,14 @@
         }
         button:hover {
             background-color: #4360b5;
+        }
+        .taskbar {
+            position: fixed;
+            top: 10px;
+            width: calc(100% - 20px);
+            height: 60px;
+            background: #2e4ead;
+            z-index: 10; /* Ensure taskbar has higher z-index than progress orb */
         }
     </style>
 </head>

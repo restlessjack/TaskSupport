@@ -64,6 +64,33 @@
         .class-container form {
             margin-bottom: 20px;
         }
+        .student-table-container {
+            max-height: 300px; /* Set the maximum height for the table container */
+            overflow-y: auto; /* Add vertical scrollbar if content exceeds max height */
+            background: #fff; /* Background color to match the rest of the design */
+            border: 1px solid #ccc; /* Optional: Add border for better visual separation */
+            border-radius: 8px; /* Match the border radius of other elements */
+            margin: 10px 0; /* Optional: Add margin around the container */
+            padding: 10px; /* Optional: Add padding inside the container */
+        }
+        .student-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        .student-table th, .student-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+            background: #fff; /* Ensure the background is white */
+        }
+        .student-table th {
+            background-color: #f0f0f0;
+            position: sticky; /* Keep headers fixed */
+            top: 0;
+            z-index: 1; /* Ensure headers are above table content */
+        }
+        
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
@@ -143,15 +170,30 @@
                     <canvas id="attendanceChart"></canvas>
                 </div>
                 <h2>Student List:</h2>
-                <ul>
-                    <% if (studentAttendancePercentages && studentAttendancePercentages.length > 0) { %>
-                        <% studentAttendancePercentages.forEach(function(student) { %>
-                            <li><%= student.username %> - Attendance: <%= student.attendancePercentage.toFixed(2) %> %</li>
-                        <% }) %>
-                    <% } else { %>
-                        <li>No students assigned</li>
-                    <% } %>
-                </ul>
+                <div class="student-table-container">
+                    <table class="student-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Attendance Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (studentAttendancePercentages && studentAttendancePercentages.length > 0) { %>
+                                <% studentAttendancePercentages.forEach(function(student) { %>
+                                    <tr>
+                                        <td><%= student.username %></td>
+                                        <td><%= student.attendancePercentage.toFixed(2) %> %</td>
+                                    </tr>
+                                <% }) %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="2">No students assigned</td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
                 <ul>
                     <form action="/attendances/attendance/<%= classInfo._id %>" method="get">
                         <button type="submit">Create Attendance Report</button>
@@ -186,7 +228,7 @@
                 <form action="/teachers/manage-tasks/<%= classInfo._id %>" method="get">
                     <button type="submit">Manage Tasks</button>
                 </form>
-                <a href="/teachers/view-classes">Back to Classes</a>
+                <button class="back-button" onclick="window.location.href='/teachers/view-classes'">Back to Classes</button>
             </div>
         </div>
     </div>

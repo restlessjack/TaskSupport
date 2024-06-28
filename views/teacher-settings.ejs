@@ -3,27 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <title>Teacher Settings</title>
+    <link rel="stylesheet" href="/css/navbar.css">
     <style>
-        input, button {
-            padding: 10px;
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #e1ecf2;
+            margin: 0;
+            padding: 0;
+        }
+        .wrapper {
             margin: 10px;
+        }
+        .main_container {
+            margin-top: 70px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #2e4ead;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #333;
+        }
+        input[type="password"] {
+            padding: 10px;
+            margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 4px;
             width: 100%;
+            max-width: 400px; /* Set a max-width for input fields */
+            box-sizing: border-box;
         }
         button {
-            background-color: #007BFF;
+            background-color: #2e4ead;
             color: white;
+            padding: 10px 20px;
             border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+            max-width: 400px; /* Set a max-width for buttons */
+            box-sizing: border-box;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #4360b5;
         }
         .message {
             padding: 10px;
-            margin: 10px;
+            margin: 10px 0;
             border-radius: 4px;
-            width: 100%;
+            width: calc(100% - 22px); /* Adjusted for padding */
+            box-sizing: border-box;
         }
         .success {
             background-color: #d4edda;
@@ -41,30 +78,29 @@
     <div class="wrapper">
         <%- include('_navbar2', { userRole: userRole }) %>
         <div class="main_container">
-    <h1>Teacher Settings</h1>
+            <h1>Teacher Settings</h1>
+            <br>
+            <h2>Change Password</h2>
+            
+            <form action="/teachers/change-password" method="post">
+                <label for="oldPassword">Old Password</label>
+                <input type="password" id="oldPassword" name="oldPassword" required>
 
-    
+                <label for="newPassword">New Password</label>
+                <input type="password" id="newPassword" name="newPassword" required>
 
-    <h2>Change Password</h2>
-    <form action="/teachers/change-password" method="post">
-        <label for="oldPassword">Old Password</label>
-        <input type="password" id="oldPassword" name="oldPassword" required>
+                <label for="confirmPassword">Confirm New Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                
+                <button type="submit">Change Password</button>
+            </form>
 
-        <label for="newPassword">New Password</label>
-        <input type="password" id="newPassword" name="newPassword" required>
-
-        <label for="confirmPassword">Confirm New Password</label>
-        <input type="password" id="confirmPassword" name="confirmPassword" required>
-        
-        <button type="submit">Change Password</button>
-    </form>
-
-    <% if (message) { %>
-        <div class="message <%= messageType %>">
-            <%= message %>
+            <% if (message) { %>
+                <div class="message <%= messageType %>">
+                    <%= message %>
+                </div>
+            <% } %>
         </div>
-    <% } %>
-    </div>
     </div>
 </body>
 </html>
