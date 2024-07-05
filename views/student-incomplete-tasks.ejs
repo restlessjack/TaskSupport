@@ -46,6 +46,7 @@
             <h1>Your Incomplete Tasks</h1>
             <form action="/students/mark-tasks-complete" method="post">
                 <input type="hidden" name="returnUrl" value="<%= req.originalUrl %>">
+                
                 <% if (newTasks && newTasks.length > 0) { %>
                     <h2>New Tasks</h2>
                     <div class="task-list">
@@ -67,8 +68,11 @@
                     </div>
                 <% } %>
 
-                <% if (otherTasks && otherTasks.length > 0) { %>
+                <% if (newTasks && newTasks.length > 0 && otherTasks && otherTasks.length > 0) { %>
                     <h2>Other Incomplete Tasks</h2>
+                <% } %>
+
+                <% if (otherTasks && otherTasks.length > 0) { %>
                     <div class="task-list">
                         <% otherTasks.forEach(task => { %>
                             <div class="task-item">

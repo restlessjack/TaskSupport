@@ -9,12 +9,22 @@
     font-family: 'Montserrat', sans-serif;
 }
 
+.main_container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
 body {
     background: #e1ecf2;
 }
 
 .wrapper {
-    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
 }
 
 .wrapper .top_navbar {
@@ -22,8 +32,9 @@ body {
     height: 60px;
     display: flex;
     position: fixed;
-    top: 10px;
+    top: 0; /* Adjusted to be 0 */
     z-index: 10;
+    
 }
 
 .wrapper .top_navbar .hamburger {
@@ -89,7 +100,7 @@ body {
 
 .wrapper .sidebar {
     position: fixed;
-    top: 70px;
+    top: 60px;
     left: 10px;
     background: #2e4ead;
     width: 200px;
@@ -141,7 +152,7 @@ body {
 
 .wrapper .main_container {
     width: calc(100% - 200px);
-    margin-top: 70px;
+    margin-top: 60px;
     margin-left: 200px;
     padding: 15px;
     transition: all 0.3s ease;
@@ -191,4 +202,18 @@ body {
 
 .back-button:hover {
     background-color: #aaa !important;
+}
+
+.message {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+}
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
 }

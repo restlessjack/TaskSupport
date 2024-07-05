@@ -7,6 +7,18 @@
     <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
     <script src="/js/navbar.js"></script>
     <style>
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .main_container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
         .class-container ul {
             list-style-type: none;
             padding: 0;
@@ -14,12 +26,9 @@
         .class-container li {
             padding: 10px;
             margin-bottom: 5px;
-            background-color: #f0f0f0;
+            background-color: #f9f9f9;
             border-radius: 5px;
-        }
-        .class-container a {
-            text-decoration: none;
-            color: black;
+            border: 1px solid #ddd;
         }
         .class-container button, .class-container .add-field {
             cursor: pointer;
@@ -30,12 +39,13 @@
             color: white;
             border-radius: 5px;
             font-size: 16px;
+            transition: background-color 0.3s ease;
         }
         .class-container button:hover, .class-container .add-field:hover {
             background-color: #4360b5;
         }
         .class-container input, .class-container textarea, .class-container select {
-            width: 95%;
+            width: 100%;
             padding: 12px;
             margin: 8px 0;
             display: inline-block;
@@ -47,31 +57,30 @@
             display: none;
         }
         .class-container .chart-container {
-            width: 100%; /* Make the container responsive */
-            max-width: 600px; /* Set a max-width for better presentation */
-            height: auto; /* Adjust height to content */
-            margin: 20px auto; /* Center the chart and add margin */
-            background-color: #fff; /* Add white background */
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            margin: 20px auto;
+            background-color: #fff;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         .class-container canvas {
             display: block;
-            width: 100%; /* Make canvas responsive */
-            height: auto; /* Adjust height to content */
+            width: 100%;
+            height: auto;
         }
         .class-container form {
             margin-bottom: 20px;
         }
         .student-table-container {
-            max-height: 300px; /* Set the maximum height for the table container */
-            overflow-y: auto; /* Add vertical scrollbar if content exceeds max height */
-            background: #fff; /* Background color to match the rest of the design */
-            border: 1px solid #ccc; /* Optional: Add border for better visual separation */
-            border-radius: 8px; /* Match the border radius of other elements */
-            margin: 10px 0; /* Optional: Add margin around the container */
-            padding: 10px; /* Optional: Add padding inside the container */
+            max-height: 300px;
+            overflow-y: auto;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin: 10px 0;
         }
         .student-table {
             width: 100%;
@@ -79,18 +88,56 @@
             table-layout: fixed;
         }
         .student-table th, .student-table td {
-            border: 1px solid #ccc;
             padding: 10px;
             text-align: left;
-            background: #fff; /* Ensure the background is white */
         }
         .student-table th {
             background-color: #f0f0f0;
-            position: sticky; /* Keep headers fixed */
+            position: sticky;
             top: 0;
-            z-index: 1; /* Ensure headers are above table content */
+            z-index: 1;
         }
-        
+        .container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .left-container {
+            flex: 1;
+            margin-right: 20px;
+        }
+        .right-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .button-group form {
+            margin: 10px 0;
+        }
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: #e53935;
+        }
+        .spacing {
+            margin-bottom: 30px;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
@@ -163,43 +210,58 @@
         <%- include('_navbar2', { userRole: userRole }) %>
         <div class="main_container">
             <div class="class-container">
-                <h1>Class: <%= classInfo.name %></h1>
-                <h2>Total Attendance Percentage: <%= totalAttendancePercentage.toFixed(2) %> %</h2>
-                <h2>Attendance Over Time:</h2>
+                <h1><%= classInfo.name %></h1>
+                <h2>Total Attendance Percentage: <%= totalAttendancePercentage.toFixed(2) %> %</h2> 
+                
+                <div class="spacing"></div>
+                
                 <div class="chart-container">
                     <canvas id="attendanceChart"></canvas>
                 </div>
-                <h2>Student List:</h2>
-                <div class="student-table-container">
-                    <table class="student-table">
-                        <thead>
-                            <tr>
-                                <th>Username</th>
-                                <th>Attendance Percentage</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% if (studentAttendancePercentages && studentAttendancePercentages.length > 0) { %>
-                                <% studentAttendancePercentages.forEach(function(student) { %>
+                
+                <div class="spacing"></div>
+                
+                <div class="container">
+                    <div class="left-container">
+                        <div class="student-table-container">
+                            <table class="student-table">
+                                <thead>
                                     <tr>
-                                        <td><%= student.username %></td>
-                                        <td><%= student.attendancePercentage.toFixed(2) %> %</td>
+                                        <th>Username</th>
+                                        <th>Attendance Percentage</th>
                                     </tr>
-                                <% }) %>
-                            <% } else { %>
-                                <tr>
-                                    <td colspan="2">No students assigned</td>
-                                </tr>
-                            <% } %>
-                        </tbody>
-                    </table>
+                                </thead>
+                                <tbody>
+                                    <% if (studentAttendancePercentages && studentAttendancePercentages.length > 0) { %>
+                                        <% studentAttendancePercentages.forEach(function(student) { %>
+                                            <tr>
+                                                <td><%= student.username %></td>
+                                                <td><%= student.attendancePercentage.toFixed(2) %> %</td>
+                                            </tr>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="2">No students assigned</td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="right-container">
+                        <div class="button-group">
+                            <form action="/attendances/attendance/<%= classInfo._id %>" method="get">
+                                <button type="submit">Create Attendance Report</button>
+                            </form>
+                            <form action="/teachers/manage-tasks/<%= classInfo._id %>" method="get">
+                                <button type="submit">Manage Tasks</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <ul>
-                    <form action="/attendances/attendance/<%= classInfo._id %>" method="get">
-                        <button type="submit">Create Attendance Report</button>
-                    </form>
-                </ul>
-                <br>
+                
+                <div class="spacing"></div>
+                
                 <h2>Add Task:</h2>
                 <br>
                 <!-- Form to add a new task -->
@@ -219,16 +281,13 @@
                     <button type="button" id="add-importance" class="add-field" onclick="toggleField('importance-field', 'add-importance', 'remove-importance')">+ Add Importance</button>
 
                     <div id="duedate-field" class="hidden">
-                        <label for="optionalDueDate">Due Date:</label>
+                        <label for="optionalDueDate"><br>Due Date:</label>
                         <input type="date" id="optionalDueDate" name="optionalDueDate">
                         <button type="button" id="remove-duedate" class="hidden" onclick="toggleField('duedate-field', 'add-duedate', 'remove-duedate')">- Remove Due Date</button>
                     </div>
                     <button type="button" id="add-duedate" class="add-field" onclick="toggleField('duedate-field', 'add-duedate', 'remove-duedate')">+ Add Due Date</button>
 
                     <button type="submit">Add Task</button>
-                </form>
-                <form action="/teachers/manage-tasks/<%= classInfo._id %>" method="get">
-                    <button type="submit">Manage Tasks</button>
                 </form>
                 <button class="back-button" onclick="window.location.href='/teachers/view-classes'">Back to Classes</button>
             </div>

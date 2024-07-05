@@ -9,8 +9,48 @@
         <%- include('_navbar2', { userRole: userRole }) %>
         <div class="main_container">
             <h1>Welcome, <%= username %>!</h1> <!-- Display the username -->
-   
+            <div id="quote-container">
+                <div id="daily-quote" style="font-size: 18px; font-style: italic; color: #333; margin-top: 20px;"></div>
+                <div id="quote-author" style="margin-top: 10px; font-size: 16px; color: #555;"></div>
+            </div>
+        </div>
     </div>
-    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const quotes = [
+                { text: "The best way to predict the future is to create it.", author: "Socrates" },
+                { text: "Tell me and I forget. Teach me and I remember. Involve me and I learn.", author: "Benjamin Franklin" },
+                { text: "Teaching is the greatest act of optimism.", author: "Colleen Wilcox" },
+                { text: "If you are planning for a year, sow rice; if you are planning for a decade, plant trees; if you are planning for a lifetime, educate people.", author: "Chinese Proverb" },
+                { text: "Education is not preparation for life; education is life itself.", author: "John Dewey" },
+                { text: "What sculpture is to a block of marble, education is to a human soul.", author: "Joseph Addison" },
+                { text: "Teaching is the one profession that creates all other professions.", author: "Unknown" },
+                { text: "Education breeds confidence. Confidence breeds hope. Hope breeds peace.", author: "Confucius" },
+                { text: "If someone is going down the wrong road, he doesn’t need motivation to speed him up. What he needs is education to turn him around.", author: "Jim Rohn" },
+                { text: "The dream begins, most of the time, with a teacher who believes in you, who tugs and pushes and leads you on to the next plateau, sometimes poking you with a sharp stick called truth.", author: "Dan Rather" },
+                { text: "The art of teaching is the art of assisting discovery.", author: "Mark Van Doren" },
+                { text: "What the teacher is, is more important than what he teaches.", author: "Karl Meninger" },
+                { text: "Every child deserves a champion—an adult who will never give up on them, who understands the power of connection and insists that they become the best that they can possibly be.", author: "Rita Pierson" },
+                { text: "The mediocre teacher tells. The good teacher explains. The superior teacher demonstrates. The great teacher inspires.", author: "William A. Ward" },
+                { text: "Better than a thousand days of diligent study is one day with a great teacher.", author: "Japanese Proverb" },
+                { text: "A good teacher is like a candle—it consumes itself to light the way for others.", author: "Mustafa Kemal Atatürk" },
+                { text: "Education is not the filling of a pail but the lighting of a fire.", author: "William Butler Yeats" },
+                { text: "Teaching is more than imparting knowledge; it is inspiring change. Learning is more than absorbing facts; it is acquiring understanding.", author: "William Arthur Ward" },
+                { text: "Children must be taught how to think, not what to think.", author: "Margaret Mead" },
+                { text: "You can teach a student a lesson for a day, but if you can teach him to learn by creating curiosity, he will continue the learning process as long as he lives.", author: "Clay P. Bedford" },
+                { text: "If kids come to us from strong, healthy, functioning families, it makes our job easier. If they do not come to us from strong, healthy, functioning families, it makes our job more important.", author: "Barbara Colorose" },
+                { text: "What we want is to see the child in pursuit of knowledge, and not knowledge in pursuit of the child.", author: "George Bernard Shaw" },
+                { text: "Students don’t care how much you know until they know how much you care.", author: "Anonymous" },
+                { text: "It takes a big heart to help shape little minds.", author: "Unknown" },
+                { text: "Education is the most powerful weapon which you can use to change the world.", author: "Nelson Mandela" }
+            ];
+
+            const randomIndex = Math.floor(Math.random() * quotes.length);
+            const quote = quotes[randomIndex];
+            document.getElementById('daily-quote').innerText = `"${quote.text}"`;
+            document.getElementById('quote-author').innerText = `- ${quote.author}`;
+        });
+    </script>
 </body>
 </html>

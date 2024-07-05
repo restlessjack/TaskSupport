@@ -61,9 +61,8 @@
         <%- include('_navbar2', { userRole: userRole }) %>
         <div class="main_container">
             <div class="task-container">
-                <h1>Manage Tasks for <%= classInfo.name %></h1>
+                <h1>Tasks for <%= classInfo.name %>:</h1><br>
 
-                <h2>Existing Tasks</h2>
                 <ul>
                     <% if (classInfo.tasks && classInfo.tasks.length > 0) { %>
                         <% classInfo.tasks.forEach(function(task) { %>

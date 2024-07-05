@@ -27,19 +27,19 @@ router.post('/register', async (req, res) => {
 });
 
 
-// Login route
-// Login route
+
+/// Login route
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
     try {
         const user = await User.findOne({ username });
         if (!user) {
-            return res.status(400).send('User not found');
+            return res.render('login', { message: 'User not found', messageType: 'error' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).send('Invalid Credentials');
+            return res.render('login', { message: 'Invalid Credentials', messageType: 'error' });
         }
 
         req.session.userId = user._id;
@@ -53,8 +53,13 @@ router.post('/login', async (req, res) => {
             res.redirect('/students/student-dashboard');
         }
     } catch (error) {
-        res.status(500).send('Error logging in user.');
+        res.status(500).render('login', { message: 'Error logging in user.', messageType: 'error' });
     }
+});
+
+// Render the login page with default values
+router.get('/login', (req, res) => {
+    res.render('login', { message: '', messageType: '' });
 });
 
 router.get('/logout', (req, res) => {

@@ -4,6 +4,7 @@ const Class = require('../models/class');
 const User = require('../models/user');
 const Task = require('../models/task');
 const Attendance = require('../models/attendance');
+const Notification = require('../models/notification');
 const { calculatePercent } = require('../utils/calculationUtils');
 const { changeUserPassword } = require('../utils/userUtils'); // Adjust path if necessary
 
@@ -293,7 +294,13 @@ router.post('/edit-task/:taskId', verifyTeacher, async (req, res) => {
 router.post('/delete-task/:taskId', verifyTeacher, async (req, res) => {
     try {
         const taskId = req.params.taskId;
+
+        // Delete the task
         await Task.findByIdAndDelete(taskId);
+
+        // Delete related notifications
+        await Notification.deleteMany({ task: taskId });
+
         res.redirect('/teachers/manage-tasks/' + req.body.classId);
     } catch (error) {
         res.status(500).send('Error deleting task');
