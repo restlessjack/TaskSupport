@@ -11,6 +11,8 @@
             margin: 10px 0;
             border-radius: 8px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            max-height: 100px; /* Limit the height */
+            overflow-y: auto; /* Add scroll for overflow */
         }
         .circular-progress {
             position: relative;
@@ -87,25 +89,28 @@
                 <div id="taskCompletion" class="circular-progress" data-completed="<%= completedTasks %>" data-total="<%= totalTasks %>" style="--percentage: <%= completionPercentage * 3.6 %>deg;"></div>
             </div>
 
-            <h2>Incomplete Tasks:</h2>
-            <form action="/students/mark-tasks-complete" method="post">
-                <input type="hidden" name="returnUrl" value="<%= req.originalUrl %>">
-                <ul>
-                    <% tasks.filter(task => !task.completions.find(c => c.student.toString() === userId.toString()).completed).forEach(function(task) { %>
-                        <li class="task">
-                            <strong>Description:</strong> <%= task.description %> - 
-                            <strong>Due:</strong> <%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'No due date' %> -
-                            <strong>Importance:</strong> <%= task.importance %>
-                            <% if (task.moreInfo) { %>
-                                <a href="/students/moreinfo/<%= task._id %>" class="more-info">More Info</a>
-                            <% } %>
-                            <label>
-                                <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
-                            </label>
-                        </li>
-                    <% }); %>
-                </ul>
+            <% if (tasks.filter(task => !task.completions.find(c => c.student.toString() === userId.toString()).completed).length > 0) { %>
+                <h2>Incomplete Tasks:</h2>
+                <form action="/students/mark-tasks-complete" method="post">
+                    <input type="hidden" name="returnUrl" value="<%= req.originalUrl %>">
+                    <ul>
+                        <% tasks.filter(task => !task.completions.find(c => c.student.toString() === userId.toString()).completed).forEach(function(task) { %>
+                            <li class="task">
+                                <strong>Description:</strong> <%= task.description %> - 
+                                <strong>Due:</strong> <%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'No due date' %> -
+                                <strong>Importance:</strong> <%= task.importance %>
+                                <% if (task.moreInfo) { %>
+                                    <a href="/students/moreinfo/<%= task._id %>" class="more-info">More Info</a>
+                                <% } %>
+                                <label>
+                                    <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
+                                </label>
+                            </li>
+                        <% }); %>
+                    </ul>
+            <% } %>
 
+            <% if (tasks.filter(task => task.completions.find(c => c.student.toString() === userId.toString()).completed).length > 0) { %>
                 <h2>Completed Tasks:</h2>
                 <ul>
                     <% tasks.filter(task => task.completions.find(c => c.student.toString() === userId.toString()).completed).forEach(function(task) { %>
@@ -119,19 +124,24 @@
                         </li>
                     <% }); %>
                 </ul>
-
-                <input type="hidden" name="classId" value="<%= classId %>">
-                <button type="submit">Submit Changes</button>
-            </form>
-            <br>
-            <button onclick="window.location.href='/students/class-attendance-report/<%= classId %>'">View Attendance Report</button>
-            <br>
-            <br>
-            <button onclick="window.location.href='/students/student-dashboard'">Back to Dashboard</button>
-            <% if (typeof message !== 'undefined' && message.trim()) { %>
-                <div class="message <%= messageType %>"><%= message %></div>
             <% } %>
-        </div>
+
+            <% if (totalTasks === 0) { %>
+                <div class="no-tasks">No tasks available</div>
+            <% } %>
+
+            <input type="hidden" name="classId" value="<%= classId %>">
+            <button type="submit">Submit Changes</button><br>
+        </form>
+        <br>
+        <button onclick="window.location.href='/students/class-attendance-report/<%= classId %>'">View Attendance Report</button>
+        <br>
+        <br>
+        <button onclick="window.location.href='/students/student-dashboard'">Back to Dashboard</button>
+        <% if (typeof message !== 'undefined' && message.trim()) { %>
+            <div class="message <%= messageType %>"><%= message %></div>
+        <% } %>
     </div>
+</div>
 </body>
 </html>
