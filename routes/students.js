@@ -8,6 +8,7 @@ const { changeUserPassword } = require('../utils/userUtils'); // Adjust path if 
 const Task = require('../models/task');
 const mongoose = require('mongoose');
 const UserSettings = require('../models/userSettings');
+const { body, validationResult } = require('express-validator');
 
 function verifyStudent(req, res, next) {
     if (!req.session.userId || req.session.userRole !== 'student') {
@@ -413,9 +414,30 @@ router.get('/settings', verifyStudent, async (req, res) => {
 });
 
 // Update settings
-router.post('/settings', verifyStudent, async (req, res) => {
+// Update settings
+router.post('/settings', verifyStudent, [
+    body('attendanceThreshold')
+        .isInt({ min: 0, max: 100 }).withMessage('Attendance threshold must be an integer between 0 and 100'),
+    body('dueDateNotificationDays')
+        .isInt({ min: 0 }).withMessage('Due date notification days must be a non-negative integer')
+], async (req, res) => {
+    const errors = validationResult(req);
+    const userId = req.session.userId;
+    let settings = await UserSettings.findOne({ user: userId });
+    if (!settings) {
+        settings = new UserSettings({ user: userId });
+        await settings.save();
+    }
+
+    if (!errors.isEmpty()) {
+        return res.render('student-settings', {
+            settings,
+            message: errors.array().map(error => error.msg).join(', '),
+            messageType: 'error'
+        });
+    }
+
     try {
-        const userId = req.session.userId;
         const { attendanceThreshold, dueDateNotificationDays } = req.body;
 
         await UserSettings.findOneAndUpdate(
@@ -424,7 +446,11 @@ router.post('/settings', verifyStudent, async (req, res) => {
             { upsert: true, new: true }
         );
 
-        res.redirect('/students/settings');
+        res.render('student-settings', {
+            settings,
+            message: 'Settings updated successfully.',
+            messageType: 'success'
+        });
     } catch (error) {
         console.error('Error updating settings:', error);
         res.status(500).send('Failed to update settings');
@@ -511,16 +537,34 @@ router.post('/mark-notifications-not-new', verifyStudent, async (req, res) => {
     }
 });
 
-
-
-router.post('/change-password', verifyStudent, async (req, res) => {
-    const { oldPassword, newPassword, confirmPassword } = req.body;
+// Change password
+router.post('/change-password', verifyStudent, [
+    body('oldPassword')
+        .notEmpty().withMessage('Old password is required'),
+    body('newPassword')
+        .isLength({ min: 8 }).withMessage('New password must be at least 8 characters long')
+        .matches(/\d/).withMessage('New password must contain a number')
+        .matches(/[a-z]/).withMessage('New password must contain a lowercase letter')
+        .matches(/[A-Z]/).withMessage('New password must contain an uppercase letter')
+        .matches(/[!@#$%^&*]/).withMessage('New password must contain a special character'),
+    body('confirmPassword')
+        .custom((value, { req }) => value === req.body.newPassword).withMessage('Passwords do not match')
+], async (req, res) => {
+    const errors = validationResult(req);
     const userId = req.session.userId;
+    const settings = await UserSettings.findOne({ user: userId });
 
-    const result = await changeUserPassword(userId, oldPassword, newPassword, confirmPassword);
+    if (!errors.isEmpty()) {
+        return res.render('student-settings', {
+            settings,
+            message: errors.array().map(error => error.msg).join(', '),
+            messageType: 'error'
+        });
+    }
 
     try {
-        const settings = await UserSettings.findOne({ user: userId });
+        const { oldPassword, newPassword, confirmPassword } = req.body;
+        const result = await changeUserPassword(userId, oldPassword, newPassword, confirmPassword);
 
         if (result.success) {
             res.render('student-settings', { settings, message: result.message, messageType: 'success' });
@@ -532,6 +576,7 @@ router.post('/change-password', verifyStudent, async (req, res) => {
         res.status(500).send('Failed to load settings');
     }
 });
+
 
 
 router.get('/student-attendance-report', verifyStudent, async (req, res) => {
