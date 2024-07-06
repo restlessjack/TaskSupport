@@ -32,32 +32,53 @@ async function generateAttendanceNotifications(req, res, next) {
         }
 
         await Promise.all(classes.map(async classInfo => {
-            const { studentAttendancePercentage } = await calculateClassAttendance(classInfo._id, userId);
+            const attendanceRecords = await Attendance.find({ class: classInfo._id, "records.student": userId });
 
-            if (studentAttendancePercentage < settings.attendanceThreshold) {
-                const oneDayAgo = new Date();
-                oneDayAgo.setDate(oneDayAgo.getDate() - 1);
-
+            if (attendanceRecords.length === 0) {
                 const existingNotification = await Notification.findOne({
                     user: userId,
-                    type: 'Low Attendance',
-                    class: classInfo._id,
-                    $or: [
-                        { read: false },
-                        { dontShowAgain: true },
-                        { readAt: { $gt: oneDayAgo } } // Read within the last day
-                    ]
+                    type: 'New Class',
+                    class: classInfo._id
                 });
 
                 if (!existingNotification) {
                     const notification = new Notification({
                         user: userId,
-                        type: 'Low Attendance',
+                        type: 'New Class',
                         class: classInfo._id,
-                        message: `Your attendance in ${classInfo.name} is below ${settings.attendanceThreshold}%. Current attendance: ${studentAttendancePercentage.toFixed(2)}%.`,
+                        message: `You have been added to a new class: ${classInfo.name}.`,
                         read: false
                     });
                     await notification.save();
+                }
+            } else {
+                const { studentAttendancePercentage } = await calculateClassAttendance(classInfo._id, userId);
+
+                if (studentAttendancePercentage < settings.attendanceThreshold) {
+                    const oneDayAgo = new Date();
+                    oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+
+                    const existingNotification = await Notification.findOne({
+                        user: userId,
+                        type: 'Low Attendance',
+                        class: classInfo._id,
+                        $or: [
+                            { read: false },
+                            { dontShowAgain: true },
+                            { readAt: { $gt: oneDayAgo } } // Read within the last day
+                        ]
+                    });
+
+                    if (!existingNotification) {
+                        const notification = new Notification({
+                            user: userId,
+                            type: 'Low Attendance',
+                            class: classInfo._id,
+                            message: `Your attendance in ${classInfo.name} is below ${settings.attendanceThreshold}%. Current attendance: ${studentAttendancePercentage.toFixed(2)}%.`,
+                            read: false
+                        });
+                        await notification.save();
+                    }
                 }
             }
         }));
