@@ -14,83 +14,102 @@
         .student-entry {
             margin-bottom: 5px;
         }
+        .message {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
     </style>
 </head>
 <body>
     <div class="wrapper">
         <%- include('_navbar2', { userRole: userRole }) %>
         <div class="main_container">
-    <h1>Create a New Class</h1>
-    <form id="classForm">
-        <label for="name">Class Name:</label>
-        <input type="text" id="name" name="name" required>
-        
-        <label>Add Students (by username):</label>
-        <div id="studentList"></div>
-        <button type="button" onclick="addStudent()">Add Student</button>
-        
-        <button type="submit" onclick="submitForm(event)">Create Class</button>
-    </form>
-    <button onclick="window.location.href='/teachers/view-classes'">Cancel</button>
+            <h1>Create a New Class</h1>
+            <div id="messageContainer"></div>
+            <form id="classForm">
+                <label for="name">Class Name:</label>
+                <input type="text" id="name" name="name" required>
+                
+                <label>Add Students (by username):</label>
+                <div id="studentList"></div>
+                <button type="button" onclick="addStudent()">Add Student</button>
+                
+                <button type="submit" onclick="submitForm(event)">Create Class</button>
+            </form>
+            <button onclick="window.location.href='/teachers/view-classes'">Cancel</button>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            addStudent(); // Automatically add one entry field
-        });
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    addStudent(); // Automatically add one entry field
+                });
 
-        function addStudent() {
-            const studentList = document.getElementById('studentList');
-            const inputDiv = document.createElement('div');
-            inputDiv.className = 'student-entry';
-            inputDiv.innerHTML = `
-                <input type="text" name="students[]" required>
-                <button type="button" onclick="removeStudent(this)">Remove</button>
-            `;
-            studentList.appendChild(inputDiv);
-        }
+                function addStudent() {
+                    const studentList = document.getElementById('studentList');
+                    const inputDiv = document.createElement('div');
+                    inputDiv.className = 'student-entry';
+                    inputDiv.innerHTML = `
+                        <input type="text" name="students[]" required>
+                        <button type="button" onclick="removeStudent(this)">Remove</button>
+                    `;
+                    studentList.appendChild(inputDiv);
+                }
 
-        function removeStudent(button) {
-            button.parentNode.remove();
-        }
+                function removeStudent(button) {
+                    button.parentNode.remove();
+                }
 
-        function submitForm(event) {
-    event.preventDefault();
-    const form = document.getElementById('classForm');
-    const formData = new FormData(form);
-    const data = { students: [] };
+                function submitForm(event) {
+                    event.preventDefault();
+                    const form = document.getElementById('classForm');
+                    const formData = new FormData(form);
+                    const data = { students: [] };
 
-    formData.forEach((value, key) => {
-        if (key === 'students[]') {
-            data.students.push(value);
-        } else {
-            data[key] = value;
-        }
-    });
+                    formData.forEach((value, key) => {
+                        if (key === 'students[]') {
+                            data.students.push(value);
+                        } else {
+                            data[key] = value;
+                        }
+                    });
 
-    fetch('/teachers/create', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            window.location.href = data.redirect; // Redirect based on server response
-        } else {
-            throw new Error(data.message || 'Unknown error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to create class: ' + error.message);
-    });
-}
+                    fetch('/teachers/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = data.redirect; // Redirect based on server response
+                        } else {
+                            showMessage(data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showMessage('Failed to create class: ' + error.message, 'error');
+                    });
+                }
 
-
-    </script>
-    </div>
+                function showMessage(message, type) {
+                    const messageContainer = document.getElementById('messageContainer');
+                    messageContainer.innerHTML = `
+                        <div class="message ${type}">${message}</div>
+                    `;
+                }
+            </script>
+        </div>
     </div>
 </body>
 </html>

@@ -87,6 +87,19 @@
         .form-buttons .cancel-button:hover {
             background-color: #aaa;
         }
+        .message {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
     </style>
     <script>
         function addStudent() {
@@ -128,6 +141,7 @@
         <div class="main_container">
             <div class="edit-class-container">
                 <h1>Edit Class: </h1>
+                
                 <form id="classForm" method="post" action="/teachers/edit-class/<%= classInfo._id %>">
                     <label for="name">Class Name:</label>
                     <input type="text" id="name" name="name" value="<%= classInfo.name %>" required>
@@ -160,6 +174,9 @@
 
                     <div class="form-buttons">
                         <button type="submit" class="submit-button">Update Class</button>
+                        <% if (typeof message !== 'undefined' && message.trim()) { %>
+                            <div class="message <%= messageType %>"><%= message %></div>
+                        <% } %>
                         <button type="button" class="cancel-button" onclick="window.location.href='/teachers/view-classes'">Cancel</button>
                     </div>
                 </form>

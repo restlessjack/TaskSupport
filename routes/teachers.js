@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { body, validationResult } = require('express-validator');
 const Class = require('../models/class');
 const User = require('../models/user');
 const Task = require('../models/task');
@@ -34,19 +35,7 @@ router.get('/dashboard', authMiddleware, async (req, res) => {
     }
 });
 
-// Create a New Class
-router.post('/create-class', verifyTeacher, async (req, res) => {
-    const { name } = req.body;
-    const teacherId = req.session.userId;
-    try {
-        const newClass = new Class({ name, teacher: teacherId });
-        await newClass.save();
-        res.status(201).json({ message: 'Class created successfully', classId: newClass._id });
-    } catch (error) {
-        console.error('Error creating class:', error);
-        res.status(500).send('Failed to create class');
-    }
-});
+
 
 // Get all classes for a teacher
 router.get('/view-classes', verifyTeacher, async (req, res) => {
@@ -60,26 +49,40 @@ router.get('/view-classes', verifyTeacher, async (req, res) => {
 });
 
 // Route to create a new class form
+// Route to create a new class form
 router.get('/create', verifyTeacher, (req, res) => {
-    res.render('create-class');
+    res.render('create-class', { message: '', messageType: '' });
 });
 
-router.post('/create', verifyTeacher, async (req, res) => {
+// Consolidated Create Class Route
+router.post('/create', verifyTeacher, [
+    body('name').trim().notEmpty().withMessage('Class name is required'),
+    body('students').isArray().withMessage('Students should be an array of usernames')
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ success: false, message: errors.array().map(err => err.msg).join(', ') });
+    }
+
     const { name, students } = req.body;
     try {
         const studentIds = await User.find({ username: { $in: students } }).select('_id');
+        if (studentIds.length !== students.length) {
+            return res.status(400).json({ success: false, message: 'One or more student usernames are invalid' });
+        }
         const newClass = new Class({
             name,
             teacher: req.session.userId,
             students: studentIds.map(s => s._id)
         });
         await newClass.save();
-        res.json({ success: true, redirect: '/teachers/view-classes' });
+        res.status(201).json({ success: true, redirect: '/teachers/view-classes' });
     } catch (error) {
         console.error('Error creating class:', error);
         res.status(500).json({ success: false, message: 'Error creating class' });
     }
 });
+
 
 // Route to edit a class form
 router.get('/edit-class/:id', verifyTeacher, async (req, res) => {
@@ -88,17 +91,38 @@ router.get('/edit-class/:id', verifyTeacher, async (req, res) => {
         if (!classInfo) {
             return res.status(404).send('Class not found');
         }
-        res.render('edit-class', { classInfo });
+        res.render('edit-class', { classInfo, message: '', messageType: '' });
     } catch (error) {
         res.status(500).send('Error loading edit form');
     }
 });
 
 // Route to update a class
-router.post('/edit-class/:id', verifyTeacher, async (req, res) => {
+router.post('/edit-class/:id', verifyTeacher, [
+    body('name').trim().notEmpty().withMessage('Class name is required'),
+    body('students').isArray().withMessage('Students should be an array of usernames')
+], async (req, res) => {
+    const errors = validationResult(req);
+    const classInfo = await Class.findById(req.params.id).populate('students', 'username');
+
+    if (!errors.isEmpty()) {
+        return res.render('edit-class', {
+            classInfo,
+            message: errors.array().map(err => err.msg).join(', '),
+            messageType: 'error'
+        });
+    }
+
     const { name, students } = req.body;
     try {
         const studentIds = await User.find({ username: { $in: students } }).select('_id');
+        if (studentIds.length !== students.length) {
+            return res.render('edit-class', {
+                classInfo,
+                message: 'One or more student usernames are invalid',
+                messageType: 'error'
+            });
+        }
         const updatedClass = {
             name,
             students: studentIds.map(s => s._id)
@@ -107,12 +131,24 @@ router.post('/edit-class/:id', verifyTeacher, async (req, res) => {
         res.redirect('/teachers/view-classes');
     } catch (error) {
         console.error('Error updating class:', error);
-        res.status(500).send('Error updating class');
+        res.status(500).render('edit-class', {
+            classInfo,
+            message: 'Error updating class',
+            messageType: 'error'
+        });
     }
 });
 
 // Add a student to a class
-router.put('/add-student', verifyTeacher, async (req, res) => {
+router.put('/add-student', verifyTeacher, [
+    body('classId').isMongoId().withMessage('Invalid class ID'),
+    body('studentId').isMongoId().withMessage('Invalid student ID')
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     const { classId, studentId } = req.body;
     try {
         const updatedClass = await Class.findByIdAndUpdate(classId, {
@@ -126,7 +162,15 @@ router.put('/add-student', verifyTeacher, async (req, res) => {
 });
 
 // Remove a student from a class
-router.put('/remove-student', verifyTeacher, async (req, res) => {
+router.put('/remove-student', verifyTeacher, [
+    body('classId').isMongoId().withMessage('Invalid class ID'),
+    body('studentId').isMongoId().withMessage('Invalid student ID')
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     const { classId, studentId } = req.body;
     try {
         const updatedClass = await Class.findByIdAndUpdate(classId, {
@@ -164,7 +208,16 @@ router.post('/delete-class/:id', verifyTeacher, async (req, res) => {
     }
 });
 
-router.post('/create-task/:classId', verifyTeacher, async (req, res) => {
+router.post('/create-task/:classId', verifyTeacher, [
+    body('description').trim().notEmpty().withMessage('Task description is required'),
+    body('importance').optional().isIn(['low', 'medium', 'high']).withMessage('Importance must be low, medium, or high'),
+    body('optionalDueDate').optional().isISO8601().withMessage('Optional due date must be a valid date')
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).send(errors.array());
+    }
+
     const { description, importance, optionalDueDate } = req.body;
     const classId = req.params.classId;
 
@@ -199,7 +252,6 @@ router.post('/create-task/:classId', verifyTeacher, async (req, res) => {
         res.status(500).send('Failed to create task');
     }
 });
-
 
 // View class details
 router.get('/view-class/:id', verifyTeacher, async (req, res) => {
@@ -280,7 +332,16 @@ router.get('/edit-task/:taskId', verifyTeacher, async (req, res) => {
 });
 
 // Route to update a task
-router.post('/edit-task/:taskId', verifyTeacher, async (req, res) => {
+router.post('/edit-task/:taskId', verifyTeacher, [
+    body('description').trim().notEmpty().withMessage('Task description is required'),
+    body('importance').optional().isIn(['low', 'medium', 'high']).withMessage('Importance must be low, medium, or high'),
+    body('optionalDueDate').optional().isISO8601().withMessage('Optional due date must be a valid date')
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).send(errors.array());
+    }
+
     const { description, importance, optionalDueDate } = req.body;
     try {
         await Task.findByIdAndUpdate(req.params.taskId, { description, importance, optionalDueDate });
@@ -307,16 +368,31 @@ router.post('/delete-task/:taskId', verifyTeacher, async (req, res) => {
     }
 });
 
-
-
 // Display teacher settings page
 router.get('/settings', verifyTeacher, async (req, res) => {
     res.render('teacher-settings', { message: null, messageType: null });
 });
 
-
 // Route for handling password change
-router.post('/change-password', verifyTeacher, async (req, res) => {
+router.post('/change-password', verifyTeacher, [
+    body('oldPassword').notEmpty().withMessage('Old password is required'),
+    body('newPassword')
+        .isLength({ min: 8 }).withMessage('New password must be at least 8 characters long')
+        .matches(/\d/).withMessage('New password must contain a number')
+        .matches(/[a-z]/).withMessage('New password must contain a lowercase letter')
+        .matches(/[A-Z]/).withMessage('New password must contain an uppercase letter')
+        .matches(/[!@#$%^&*]/).withMessage('New password must contain a special character'),
+    body('confirmPassword')
+        .custom((value, { req }) => value === req.body.newPassword).withMessage('Passwords do not match')
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.render('teacher-settings', {
+            message: errors.array().map(error => error.msg).join(', '),
+            messageType: 'error'
+        });
+    }
+
     const { oldPassword, newPassword, confirmPassword } = req.body;
     const userId = req.session.userId;
 
@@ -328,10 +404,5 @@ router.post('/change-password', verifyTeacher, async (req, res) => {
         res.render('teacher-settings', { message: result.message, messageType: 'error' });
     }
 });
-
-
-
-
-
 
 module.exports = router;
