@@ -330,13 +330,18 @@ router.get('/student-incomplete-tasks', verifyStudent, async (req, res) => {
             )
         );
 
+        const message = req.query.message || '';
+        const messageType = req.query.messageType || '';
+        
         
 
         res.render('student-incomplete-tasks', {
             newTasks: newTasks,
             otherTasks: otherTasks,
             userId: userId,
-            req: req // Pass req to the template
+            req: req, // Pass req to the template
+            message: message, 
+            messageType: messageType 
         });
     } catch (error) {
         console.error('Error retrieving incomplete tasks:', error);
@@ -358,8 +363,8 @@ router.post('/mark-tasks-complete', verifyStudent, async (req, res) => {
         const userId = req.session.userId;
         const { completedTasks, returnUrl } = req.body;
 
-        if (!completedTasks) {
-            return res.redirect(returnUrl || '/students/student-incomplete-tasks');
+        if (!completedTasks || (Array.isArray(completedTasks) && completedTasks.length === 0)) {
+            return res.redirect(`${returnUrl.split('?')[0]}?message=No%20Tasks%20Selected&messageType=error`);
         }
 
         const taskIds = Array.isArray(completedTasks) ? completedTasks : [completedTasks];
@@ -371,7 +376,7 @@ router.post('/mark-tasks-complete', verifyStudent, async (req, res) => {
             );
         }));
 
-        return res.redirect(returnUrl || '/students/student-incomplete-tasks');
+        return res.redirect(`${returnUrl.split('?')[0]}?message=Tasks%20Marked%20as%20Complete&messageType=success`);
     } catch (error) {
         console.error('Error marking tasks as complete:', error);
         res.status(500).send('Failed to mark tasks as complete');
@@ -408,7 +413,9 @@ router.get('/student-notifications', verifyStudent, async (req, res) => {
         const userId = req.session.userId;
         let notifications = await Notification.find({ user: userId, read: false });
         notifications = notifications.reverse(); // Reverse to show the most recent ones first if needed
-        res.render('student-notifications', { notifications });
+        const message = req.query.message || '';
+        const messageType = req.query.messageType || '';
+        res.render('student-notifications', { notifications, message, messageType });
     } catch (error) {
         console.error('Error retrieving notifications:', error);
         res.status(500).send('Failed to retrieve notifications');

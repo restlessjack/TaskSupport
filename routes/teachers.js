@@ -225,7 +225,7 @@ router.put('/remove-student', verifyTeacher, [
 router.post('/create-task/:classId', verifyTeacher, [
     body('description').trim().notEmpty().withMessage('Task description is required'),
     body('importance').optional().isIn(['low', 'medium', 'high']).withMessage('Importance must be low, medium, or high'),
-    body('optionalDueDate').optional().isISO8601().withMessage('Optional due date must be a valid date')
+
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

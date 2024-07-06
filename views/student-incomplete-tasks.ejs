@@ -93,6 +93,9 @@
                 <% } %>
 
                 <button type="submit">Submit Changes</button><br><br>
+                <% if (typeof message !== 'undefined' && message.trim()) { %>
+                    <div class="message <%= messageType %>"><%= message %></div>
+                <% } %>
             </form>
             <button onclick="window.location.href='/students/student-dashboard'">Back to Dashboard</button>
         </div>
