@@ -36,17 +36,41 @@ router.get('/dashboard', authMiddleware, async (req, res) => {
 });
 
 
-
-// Get all classes for a teacher
 router.get('/view-classes', verifyTeacher, async (req, res) => {
     try {
         const classes = await Class.find({ teacher: req.session.userId }).populate('students', 'username');
-        res.render('view-classes', { classes });
+        const message = req.query.message || '';
+        const messageType = req.query.messageType || '';
+        res.render('view-classes', { classes, message, messageType });
     } catch (error) {
         console.error('Error retrieving classes:', error);
         res.status(500).render('error', { message: 'Failed to load classes' });
     }
 });
+
+// Delete a class
+router.post('/delete-class/:id', verifyTeacher, async (req, res) => {
+    try {
+        const classId = req.params.id;
+        const classInfo = await Class.findByIdAndDelete(classId);
+
+        if (!classInfo) {
+            return res.status(404).redirect('/teachers/view-classes?message=Class not found&messageType=error');
+        }
+
+        await Attendance.deleteMany({ class: classId });
+        await Task.deleteMany({ class: classId });
+        await Notification.deleteMany({ class: classId });
+
+        
+
+        res.redirect('/teachers/view-classes?message=Class deleted successfully&messageType=success');
+    } catch (error) {
+        res.status(500).redirect('/teachers/view-classes?message=Error deleting class&messageType=error');
+    }
+});
+
+
 
 // Route to create a new class form
 // Route to create a new class form
@@ -76,7 +100,8 @@ router.post('/create', verifyTeacher, [
             students: studentIds.map(s => s._id)
         });
         await newClass.save();
-        res.status(201).json({ success: true, redirect: '/teachers/view-classes' });
+        res.status(201).json({ success: true, redirect: '/teachers/view-classes?message=Class Created Sucessfully&messageType=success' });
+        
     } catch (error) {
         console.error('Error creating class:', error);
         res.status(500).json({ success: false, message: 'Error creating class' });
@@ -195,18 +220,7 @@ router.put('/remove-student', verifyTeacher, [
     }
 });
 
-// Delete a class
-router.post('/delete-class/:id', verifyTeacher, async (req, res) => {
-    try {
-        const classId = req.params.id;
-        await Class.findByIdAndDelete(classId);
-        await Attendance.deleteMany({ class: classId });
-        await Task.deleteMany({ class: classId });
-        res.redirect('/teachers/view-classes');
-    } catch (error) {
-        res.status(500).send('Error deleting class');
-    }
-});
+
 
 router.post('/create-task/:classId', verifyTeacher, [
     body('description').trim().notEmpty().withMessage('Task description is required'),

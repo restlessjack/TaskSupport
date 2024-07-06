@@ -37,6 +37,12 @@
         .class-item button:hover {
             background-color: #4360b5;
         }
+        .delete-button {
+            background-color: #ff4d4d;
+        }
+        .delete-button:hover {
+            background-color: #cc0000;
+        }
         button {
             background-color: #2e4ead;
             color: white;
@@ -50,6 +56,19 @@
         button:hover {
             background-color: #4360b5;
         }
+        .message {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
     </style>
 </head>
 <body>
@@ -57,18 +76,25 @@
         <%- include('_navbar2', { userRole: userRole }) %>
         <div class="main_container">
             <h1>Your Classes</h1>
+            
             <div class="class-list">
                 <% classes.forEach(function(cls) { %>
                     <div class="class-item">
                         <a href="/teachers/view-class/<%= cls._id %>"><%= cls.name %></a>
                         <div>
                             <a href="/teachers/edit-class/<%= cls._id %>"><button>Edit</button></a>
+                            <form action="/teachers/delete-class/<%= cls._id %>" method="POST" style="display:inline;">
+                                <button type="submit" class="delete-button" onclick="return confirm('Are you sure you want to delete this class?');">Delete</button>
+                            </form>
                         </div>
                     </div>
                 <% }) %>
             </div>
+            <% if (typeof message !== 'undefined' && message.trim()) { %>
+                <div class="message <%= messageType %>"><%= message %></div>
+            <% } %>
             <button onclick="location.href='/teachers/create'">Add New Class</button>
-            
+           
         </div>
     </div>
 </body>
