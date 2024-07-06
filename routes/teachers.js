@@ -225,14 +225,15 @@ router.put('/remove-student', verifyTeacher, [
 router.post('/create-task/:classId', verifyTeacher, [
     body('description').trim().notEmpty().withMessage('Task description is required'),
     body('importance').optional().isIn(['low', 'medium', 'high']).withMessage('Importance must be low, medium, or high'),
-
+    body('optionalDueDate').optional().isISO8601().withMessage('Optional due date must be a valid date'),
+    body('moreInfo').optional().isString().trim().escape().withMessage('More info contains invalid characters')
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).send(errors.array());
     }
 
-    const { description, importance, optionalDueDate } = req.body;
+    const { description, importance, optionalDueDate, moreInfo } = req.body;
     const classId = req.params.classId;
 
     try {
@@ -251,7 +252,8 @@ router.post('/create-task/:classId', verifyTeacher, [
             class: classId,
             completions: completions,
             importance: importance || 'medium',
-            optionalDueDate: optionalDueDate || null
+            optionalDueDate: optionalDueDate || null,
+            moreInfo: moreInfo || null
         });
 
         const savedTask = await newTask.save();
@@ -329,7 +331,6 @@ router.get('/manage-tasks/:classId', verifyTeacher, async (req, res) => {
         res.status(500).render('error', { message: 'Failed to load tasks' });
     }
 });
-
 // Route to edit a task form
 router.get('/edit-task/:taskId', verifyTeacher, async (req, res) => {
     try {
@@ -349,16 +350,17 @@ router.get('/edit-task/:taskId', verifyTeacher, async (req, res) => {
 router.post('/edit-task/:taskId', verifyTeacher, [
     body('description').trim().notEmpty().withMessage('Task description is required'),
     body('importance').optional().isIn(['low', 'medium', 'high']).withMessage('Importance must be low, medium, or high'),
-    body('optionalDueDate').optional().isISO8601().withMessage('Optional due date must be a valid date')
+    body('optionalDueDate').optional().isISO8601().withMessage('Optional due date must be a valid date'),
+    body('moreInfo').optional().isString().trim().escape().withMessage('More info contains invalid characters')
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).send(errors.array());
     }
 
-    const { description, importance, optionalDueDate } = req.body;
+    const { description, importance, optionalDueDate, moreInfo } = req.body;
     try {
-        await Task.findByIdAndUpdate(req.params.taskId, { description, importance, optionalDueDate });
+        await Task.findByIdAndUpdate(req.params.taskId, { description, importance, optionalDueDate, moreInfo });
         res.redirect('/teachers/manage-tasks/' + req.body.classId);
     } catch (error) {
         res.status(500).send('Error updating task');

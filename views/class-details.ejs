@@ -287,9 +287,14 @@
                     </div>
                     <button type="button" id="add-duedate" class="add-field" onclick="toggleField('duedate-field', 'add-duedate', 'remove-duedate')">+ Add Due Date</button>
 
+                    <div id="moreinfo-field" class="hidden" style="margin-top: 20px;">
+                        <label for="moreInfo">More Info:</label>
+                        <textarea id="moreInfo" name="moreInfo" rows="4"></textarea>
+                        <button type="button" id="remove-moreinfo" class="hidden" onclick="toggleField('moreinfo-field', 'add-moreinfo', 'remove-moreinfo')">- Remove More Info</button>
+                    </div>
+                    <button type="button" id="add-moreinfo" class="add-field" onclick="toggleField('moreinfo-field', 'add-moreinfo', 'remove-moreinfo')">+ Add More Info</button>
+
                     <button type="submit">Add Task</button>
-                    
-        
                 </form>
                 <button class="back-button" onclick="window.location.href='/teachers/view-classes'">Back to Classes</button>
             </div>

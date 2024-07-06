@@ -32,6 +32,16 @@
             text-align: center;
             margin: 40px 0;
         }
+        .more-info {
+            margin-top: 10px;
+            display: inline-block;
+            color: #2e4ead;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .more-info:hover {
+            color: #4360b5;
+        }
         button {
             background-color: #2e4ead;
             color: white;
@@ -69,6 +79,9 @@
                                         <% } %>
                                         <strong>Class:</strong> <%= task.class.name %><br>
                                         <strong>Importance:</strong> <%= task.importance %><br>
+                                        <% if (task.moreInfo) { %>
+                                            <a href="/students/moreinfo/<%= task._id %>" class="more-info">More Info</a>
+                                        <% } %>
                                     </div>
                                     <label>
                                         <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
@@ -93,6 +106,9 @@
                                         <% } %>
                                         <strong>Class:</strong> <%= task.class.name %><br>
                                         <strong>Importance:</strong> <%= task.importance %><br>
+                                        <% if (task.moreInfo) { %>
+                                            <a href="/students/moreinfo/<%= task._id %>" class="more-info">More Info</a>
+                                        <% } %>
                                     </div>
                                     <label>
                                         <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete

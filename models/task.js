@@ -9,7 +9,8 @@ const taskSchema = new mongoose.Schema({
         new: { type: Boolean, default: true }
     }],
     importance: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' }, // Add importance field
-    optionalDueDate: { type: Date } // Add optional due date field
+    optionalDueDate: { type: Date }, // Add optional due date field
+    moreInfo: { type: String } // Add more info field
 }, { timestamps: { createdAt: 'date', updatedAt: 'updatedAt' } });
 
 const Task = mongoose.model('Task', taskSchema);

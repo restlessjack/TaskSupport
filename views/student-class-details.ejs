@@ -54,6 +54,16 @@
             background: #2e4ead;
             z-index: 10; /* Ensure taskbar has higher z-index than progress orb */
         }
+        .more-info {
+            margin-top: 10px;
+            display: inline-block;
+            color: #2e4ead;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .more-info:hover {
+            color: #4360b5;
+        }
     </style>
 </head>
 <body>
@@ -86,6 +96,9 @@
                             <strong>Description:</strong> <%= task.description %> - 
                             <strong>Due:</strong> <%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'No due date' %> -
                             <strong>Importance:</strong> <%= task.importance %>
+                            <% if (task.moreInfo) { %>
+                                <a href="/students/moreinfo/<%= task._id %>" class="more-info">More Info</a>
+                            <% } %>
                             <label>
                                 <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
                             </label>
@@ -100,6 +113,9 @@
                             <strong>Description:</strong> <%= task.description %> - 
                             <strong>Due:</strong> <%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'No due date' %> -
                             <strong>Importance:</strong> <%= task.importance %>
+                            <% if (task.moreInfo) { %>
+                                <a href="/students/moreinfo/<%= task._id %>" class="more-info">More Info</a>
+                            <% } %>
                         </li>
                     <% }); %>
                 </ul>

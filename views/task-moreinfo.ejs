@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Details</title>
+    <style>
+        .task-details {
+            background: #fff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: #2e4ead;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #4360b5;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <%- include('_navbar', { userRole: userRole }) %>
+        <div class="main_container">
+            <h1>Task Details</h1>
+            <div class="task-details">
+                <p><strong>Description:</strong> <%= task.description %></p>
+                <% if (task.optionalDueDate) { %>
+                    <p><strong>Due Date:</strong> <%= new Date(task.optionalDueDate).toLocaleDateString() %></p>
+                <% } %>
+                <p><strong>Class:</strong> <%= task.class.name %></p>
+                <p><strong>Importance:</strong> <%= task.importance %></p>
+                <p><strong>More Info:</strong> <%= task.moreInfo %></p>
+            </div>
+            <button onclick="window.location.href='/students/student-class-details/<%= task.class._id %>'">Back to Class Details</button>
+        </div>
+    </div>
+</body>
+</html>

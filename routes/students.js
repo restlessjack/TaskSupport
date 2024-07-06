@@ -350,6 +350,23 @@ router.get('/student-incomplete-tasks', verifyStudent, async (req, res) => {
 });
 
 
+// Route to show more info about a task
+router.get('/moreinfo/:taskId', verifyStudent, async (req, res) => {
+    try {
+        const taskId = req.params.taskId;
+        const task = await Task.findById(taskId).populate('class', 'name');
+
+        if (!task) {
+            return res.status(404).send('Task not found');
+        }
+
+        res.render('task-moreinfo', { task });
+    } catch (error) {
+        console.error('Error retrieving task details:', error);
+        res.status(500).send('Failed to retrieve task details');
+    }
+});
+
 
 
 

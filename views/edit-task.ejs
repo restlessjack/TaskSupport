@@ -26,33 +26,56 @@
         button:hover {
             background-color: #0056b3;
         }
+        .hidden {
+            display: none;
+        }
+        .spacer {
+            margin-top: 20px;
+        }
     </style>
+    <script>
+        function toggleField(fieldId, addButtonId, removeButtonId) {
+            const field = document.getElementById(fieldId);
+            const addButton = document.getElementById(addButtonId);
+            const removeButton = document.getElementById(removeButtonId);
+
+            field.classList.toggle('hidden');
+            addButton.classList.toggle('hidden');
+            removeButton.classList.toggle('hidden');
+        }
+    </script>
 </head>
 <body>
     <div class="wrapper">
         <%- include('_navbar2', { userRole: userRole }) %>
         <div class="main_container">
-    <h1>Edit Task</h1>
-    <form action="/teachers/edit-task/<%= task._id %>" method="post">
-        <label for="description">Task Description:</label>
-        <textarea id="description" name="description" required><%= task.description %></textarea>
-        
-        <label for="importance">Importance:</label>
-        <select id="importance" name="importance" required>
-            <option value="low" <%= task.importance === 'low' ? 'selected' : '' %>>Low</option>
-            <option value="medium" <%= task.importance === 'medium' ? 'selected' : '' %>>Medium</option>
-            <option value="high" <%= task.importance === 'high' ? 'selected' : '' %>>High</option>
-        </select>
+            <h1>Edit Task</h1>
+            <form action="/teachers/edit-task/<%= task._id %>" method="post">
+                <label for="description">Task Description:</label>
+                <textarea id="description" name="description" required><%= task.description %></textarea>
+                
+                <label for="importance">Importance:</label>
+                <select id="importance" name="importance" required>
+                    <option value="low" <%= task.importance === 'low' ? 'selected' : '' %>>Low</option>
+                    <option value="medium" <%= task.importance === 'medium' ? 'selected' : '' %>>Medium</option>
+                    <option value="high" <%= task.importance === 'high' ? 'selected' : '' %>>High</option>
+                </select>
 
-        <label for="optionalDueDate">Optional Due Date:</label>
-        <input type="date" id="optionalDueDate" name="optionalDueDate" value="<%= task.optionalDueDate ? task.optionalDueDate.toISOString().split('T')[0] : '' %>">
+                <label for="optionalDueDate">Optional Due Date:</label>
+                <input type="date" id="optionalDueDate" name="optionalDueDate" value="<%= task.optionalDueDate ? task.optionalDueDate.toISOString().split('T')[0] : '' %>">
 
-        <input type="hidden" name="classId" value="<%= task.class %>">
-        <button type="submit">Update Task</button>
-    </form>
-    <button class="back-button"onclick="window.location.href='/teachers/manage-tasks/<%= task.class %>'">Back to Task Management</button>
-    </div>
+                <div id="moreinfo-field" class="<%= task.moreInfo ? '' : 'hidden' %> spacer">
+                    <label for="moreInfo">More Info:</label>
+                    <textarea id="moreInfo" name="moreInfo" rows="4"><%= task.moreInfo %></textarea>
+                    <button type="button" id="remove-moreinfo" class="<%= task.moreInfo ? '' : 'hidden' %>" onclick="toggleField('moreinfo-field', 'add-moreinfo', 'remove-moreinfo')">- Remove More Info</button>
+                </div>
+                <button type="button" id="add-moreinfo" class="<%= task.moreInfo ? 'hidden' : '' %> add-field spacer" onclick="toggleField('moreinfo-field', 'add-moreinfo', 'remove-moreinfo')">+ Add More Info</button>
+
+                <input type="hidden" name="classId" value="<%= task.class %>">
+                <button type="submit">Update Task</button>
+            </form>
+            <button class="back-button" onclick="window.location.href='/teachers/manage-tasks/<%= task.class %>'">Back to Task Management</button>
+        </div>
     </div>
 </body>
-
 </html>
