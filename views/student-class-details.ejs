@@ -5,14 +5,18 @@
     <title>Class Details</title>
     <link rel="stylesheet" href="/css/navbar.css">
     <style>
+        .task-container {
+            max-height: 50vh; /* Adjust the height as necessary */
+            overflow-y: auto;
+            margin-bottom: 20px; /* Space between the container and the buttons */
+            margin-top: 10px;
+        }
         .task {
             background: #fff;
             padding: 15px;
             margin: 10px 0;
             border-radius: 8px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            max-height: 100px; /* Limit the height */
-            overflow-y: auto; /* Add scroll for overflow */
             display: flex;
             align-items: center;
         }
@@ -27,7 +31,6 @@
             justify-content: center;
             margin-right: 20px;
             float: left;
-            z-index: 1; /* Adjust z-index to be lower than taskbar */
         }
         .circular-progress::before {
             content: attr(data-completed) '/' attr(data-total);
@@ -56,21 +59,26 @@
             width: calc(100% - 20px);
             height: 60px;
             background: #2e4ead;
-            z-index: 10; /* Ensure taskbar has higher z-index than progress orb */
+            z-index: 10;
         }
         .more-info {
-            margin-top: 10px;
             display: inline-block;
-            color: #2e4ead;
             text-decoration: underline;
             cursor: pointer;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background-color: #2e4ead;
+            color: white;
+            margin-left: 10px;
+            font-size: 0.9em;
         }
         .more-info:hover {
-            color: #4360b5;
+            background-color: #4360b5;
         }
         .task label {
             display: flex;
             align-items: center;
+            width: 100%;
         }
         .task input[type="checkbox"] {
             margin-right: 10px;
@@ -93,7 +101,34 @@
             margin-right: 10px;
             font-weight: bold;
             align-items: flex-end;
-            margin-bottom: 10px; /* Adjust as necessary */
+            margin-bottom: 10px;
+            position: sticky;
+            top: 0;
+            background-color: white;
+            z-index: 5; /* Ensure it stays above other content */
+            padding: 10px 0; /* Add padding for better visibility */
+        }
+        .is-sticky {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .importance-label {
+            padding: 3px 8px;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            margin-left: 10px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        .importance-high {
+            background-color: red;
+        }
+        .importance-medium {
+            background-color: orange;
+        }
+        .importance-low {
+            background-color: green;
+            color: white;
         }
     </style>
 </head>
@@ -101,10 +136,10 @@
     <div class="wrapper">
         <%- include('_navbar', { userRole: userRole }) %>
         <div class="main_container">
-            <h1>Class: <%= className %></h1>
+            <h1><%= className %></h1>
 
             <div class="task-list">
-                <h2>Tasks Completion</h2>
+                <h2>Tasks Completed:</h2>
                 <%
                     let completedTasks = 0;
                     let totalTasks = tasks.length;
@@ -118,54 +153,57 @@
                 <div id="taskCompletion" class="circular-progress" data-completed="<%= completedTasks %>" data-total="<%= totalTasks %>" style="--percentage: <%= completionPercentage * 3.6 %>deg;"></div>
             </div>
 
-            <% if (tasks.filter(task => !task.completions.find(c => c.student.toString() === userId.toString()).completed).length > 0) { %>
-                <div class="header-row">
-                    <h2>Incomplete Tasks:</h2>
-                    <div class="due-date-header">Due Date</div>
-                </div>
-                <form action="/students/mark-tasks-complete" method="post">
-                    <input type="hidden" name="returnUrl" value="<%= req.originalUrl %>">
+            <div class="task-container">
+                <% if (tasks.filter(task => !task.completions.find(c => c.student.toString() === userId.toString()).completed).length > 0) { %>
+                    <div class="header-row">
+                        <h2>Incomplete Tasks:</h2>
+                        <div class="due-date-header">Due Date</div>
+                    </div>
+                    <form action="/students/mark-tasks-complete" method="post">
+                        <input type="hidden" name="returnUrl" value="<%= req.originalUrl %>">
+                        <ul>
+                            <% tasks.filter(task => !task.completions.find(c => c.student.toString() === userId.toString()).completed).forEach(function(task) { %>
+                                <li class="task">
+                                    <label>
+                                        <input type="checkbox" name="completedTasks" value="<%= task._id %>">
+                                        <strong>- <%= task.description %></strong>
+                                        <div class="importance-label importance-<%= task.importance.toLowerCase() %>"><%= task.importance %></div>
+                                        <% if (task.moreInfo) { %>
+                                            <a href="/students/moreinfo/<%= task._id %>" class="more-info">More Info</a>
+                                        <% } %>
+                                    </label>
+                                    <span class="due-date"><%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'None' %></span>
+                                </li>
+                            <% }); %>
+                        </ul>
+                <% } %>
+
+                <% if (tasks.filter(task => task.completions.find(c => c.student.toString() === userId.toString()).completed).length > 0) { %>
+                    <div class="header-row">
+                        <h2>Completed Tasks:</h2>
+                        <div class="due-date-header">Due Date</div>
+                    </div>
                     <ul>
-                        <% tasks.filter(task => !task.completions.find(c => c.student.toString() === userId.toString()).completed).forEach(function(task) { %>
-                            <li class="task">
+                        <% tasks.filter(task => task.completions.find(c => c.student.toString() === userId.toString()).completed).forEach(function(task) { %>
+                            <li class="task completed">
                                 <label>
-                                    <input type="checkbox" name="completedTasks" value="<%= task._id %>">
-                                    <strong>- <%= task.description %>
-                                    </strong> 
+                                    <input type="checkbox" checked disabled>
+                                    <strong>- <%= task.description %></strong>
+                                    <div class="importance-label importance-<%= task.importance.toLowerCase() %>"><%= task.importance %></div>
+                                    <% if (task.moreInfo) { %>
+                                        <a href="/students/moreinfo/<%= task._id %>" class="more-info">More Info</a>
+                                    <% } %>
                                 </label>
-                                <span class="due-date"> <%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'None' %></span>
+                                <span class="due-date"><%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'None' %></span>
                             </li>
                         <% }); %>
                     </ul>
-            <% } %>
+                <% } %>
 
-            <% if (tasks.filter(task => task.completions.find(c => c.student.toString() === userId.toString()).completed).length > 0) { %>
-                <div class="header-row">
-                    <h2>Completed Tasks:</h2>
-                    <div class="due-date-header">Due Date</div>
-                </div>
-                <ul>
-                    <% tasks.filter(task => task.completions.find(c => c.student.toString() === userId.toString()).completed).forEach(function(task) { %>
-                        <li class="task completed">
-                            <label>
-                                <input type="checkbox" checked disabled>
-                                <strong>- <%= task.description %>
-                                </strong> 
-                                 <%= task.importance %>
-                                 <% if (task.moreInfo) { %>
-                                    <a href="/students/moreinfo/<%= task._id %>" class="more-info">More Info</a>
-                                <% } %>
-                            </label>
-                            <span class="due-date"><%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'None' %></span>
-                            
-                        </li>
-                    <% }); %>
-                </ul>
-            <% } %>
-
-            <% if (totalTasks === 0) { %>
-                <div class="no-tasks">No tasks available</div>
-            <% } %>
+                <% if (totalTasks === 0) { %>
+                    <div class="no-tasks">No tasks available</div>
+                <% } %>
+            </div>
 
             <input type="hidden" name="classId" value="<%= classId %>">
             <button type="submit">Submit Changes</button><br>
@@ -180,5 +218,24 @@
         <% } %>
     </div>
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const taskContainer = document.querySelector(".task-container");
+    const headers = document.querySelectorAll(".header-row");
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            const header = entry.target;
+            if (entry.intersectionRatio < 1) {
+                header.classList.add("is-sticky");
+            } else {
+                header.classList.remove("is-sticky");
+            }
+        });
+    }, { threshold: 1 });
+
+    headers.forEach(header => observer.observe(header));
+});
+</script>
 </body>
 </html>
