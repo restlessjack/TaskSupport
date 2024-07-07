@@ -49,3 +49,5 @@ app.use('/attendances', attendanceRoutes);  // Attendance specific routes
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
+
+
