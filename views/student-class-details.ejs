@@ -13,6 +13,8 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             max-height: 100px; /* Limit the height */
             overflow-y: auto; /* Add scroll for overflow */
+            display: flex;
+            align-items: center;
         }
         .circular-progress {
             position: relative;
@@ -66,6 +68,33 @@
         .more-info:hover {
             color: #4360b5;
         }
+        .task label {
+            display: flex;
+            align-items: center;
+        }
+        .task input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.5);
+        }
+        .task .due-date {
+            margin-left: auto;
+            text-align: right;
+        }
+        .task.completed input[type="checkbox"] {
+            pointer-events: none;
+            color: grey;
+        }
+        .task.completed {
+            color: grey;
+        }
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            margin-right: 10px;
+            font-weight: bold;
+            align-items: flex-end;
+            margin-bottom: 10px; /* Adjust as necessary */
+        }
     </style>
 </head>
 <body>
@@ -90,37 +119,45 @@
             </div>
 
             <% if (tasks.filter(task => !task.completions.find(c => c.student.toString() === userId.toString()).completed).length > 0) { %>
-                <h2>Incomplete Tasks:</h2>
+                <div class="header-row">
+                    <h2>Incomplete Tasks:</h2>
+                    <div class="due-date-header">Due Date</div>
+                </div>
                 <form action="/students/mark-tasks-complete" method="post">
                     <input type="hidden" name="returnUrl" value="<%= req.originalUrl %>">
                     <ul>
                         <% tasks.filter(task => !task.completions.find(c => c.student.toString() === userId.toString()).completed).forEach(function(task) { %>
                             <li class="task">
-                                <strong>Description:</strong> <%= task.description %> - 
-                                <strong>Due:</strong> <%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'No due date' %> -
-                                <strong>Importance:</strong> <%= task.importance %>
-                                <% if (task.moreInfo) { %>
-                                    <a href="/students/moreinfo/<%= task._id %>" class="more-info">More Info</a>
-                                <% } %>
                                 <label>
-                                    <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
+                                    <input type="checkbox" name="completedTasks" value="<%= task._id %>">
+                                    <strong>- <%= task.description %>
+                                    </strong> 
                                 </label>
+                                <span class="due-date"> <%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'None' %></span>
                             </li>
                         <% }); %>
                     </ul>
             <% } %>
 
             <% if (tasks.filter(task => task.completions.find(c => c.student.toString() === userId.toString()).completed).length > 0) { %>
-                <h2>Completed Tasks:</h2>
+                <div class="header-row">
+                    <h2>Completed Tasks:</h2>
+                    <div class="due-date-header">Due Date</div>
+                </div>
                 <ul>
                     <% tasks.filter(task => task.completions.find(c => c.student.toString() === userId.toString()).completed).forEach(function(task) { %>
-                        <li class="task">
-                            <strong>Description:</strong> <%= task.description %> - 
-                            <strong>Due:</strong> <%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'No due date' %> -
-                            <strong>Importance:</strong> <%= task.importance %>
-                            <% if (task.moreInfo) { %>
-                                <a href="/students/moreinfo/<%= task._id %>" class="more-info">More Info</a>
-                            <% } %>
+                        <li class="task completed">
+                            <label>
+                                <input type="checkbox" checked disabled>
+                                <strong>- <%= task.description %>
+                                </strong> 
+                                 <%= task.importance %>
+                                 <% if (task.moreInfo) { %>
+                                    <a href="/students/moreinfo/<%= task._id %>" class="more-info">More Info</a>
+                                <% } %>
+                            </label>
+                            <span class="due-date"><%= task.optionalDueDate ? new Date(task.optionalDueDate).toLocaleDateString() : 'None' %></span>
+                            
                         </li>
                     <% }); %>
                 </ul>
