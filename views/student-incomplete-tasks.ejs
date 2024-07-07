@@ -6,6 +6,12 @@
     <title>Incomplete Tasks</title>
     <link rel="stylesheet" href="/css/navbar.css">
     <style>
+        .task-container {
+            max-height: 60vh; /* Adjust the height as necessary */
+            overflow-y: auto;
+            margin-bottom: 30px; /* Space between the container and the buttons */
+           
+        }
         .task-list {
             margin: 20px 0;
         }
@@ -61,70 +67,74 @@
         <%- include('_navbar', { userRole: userRole }) %>
         <div class="main_container">
             <h1>Your Incomplete Tasks</h1>
-            <% if (newTasks.length === 0 && otherTasks.length === 0) { %>
-                <div class="no-tasks">No incomplete tasks</div>
-            <% } else { %>
-                <form action="/students/mark-tasks-complete" method="post">
-                    <input type="hidden" name="returnUrl" value="<%= req.originalUrl %>">
-                    
-                    <% if (newTasks.length > 0) { %>
-                        <h2>New Tasks</h2>
-                        <div class="task-list">
-                            <% newTasks.forEach(task => { %>
-                                <div class="task-item new-task">
-                                    <div class="task-details">
-                                        <strong>Description:</strong> <%= task.description %><br>
-                                        <% if (task.optionalDueDate) { %>
-                                            <strong>Due Date:</strong> <%= new Date(task.optionalDueDate).toLocaleDateString() %><br>
-                                        <% } %>
-                                        <strong>Class:</strong> <%= task.class.name %><br>
-                                        <strong>Importance:</strong> <%= task.importance %><br>
-                                        <% if (task.moreInfo) { %>
-                                            <a href="/students/moreinfo/<%= task._id %>" class="more-info">More Info</a>
-                                        <% } %>
+            <div class="task-container">
+                <% if (newTasks.length === 0 && otherTasks.length === 0) { %>
+                    <div class="no-ttasks">No incomplete tasks</div>
+                <% } else { %>
+                    <form action="/students/mark-tasks-complete" method="post">
+                        <input type="hidden" name="returnUrl" value="<%= req.originalUrl %>">
+                        
+                        <% if (newTasks.length > 0) { %>
+                            <h2>New Tasks</h2>
+                            <div class="task-list">
+                                <% newTasks.forEach(task => { %>
+                                    <div class="task-item new-task">
+                                        <div class="task-details">
+                                            <strong>Description:</strong> <%= task.description %><br>
+                                            <% if (task.optionalDueDate) { %>
+                                                <strong>Due Date:</strong> <%= new Date(task.optionalDueDate).toLocaleDateString() %><br>
+                                            <% } %>
+                                            <strong>Class:</strong> <%= task.class.name %><br>
+                                            <strong>Importance:</strong> <%= task.importance %><br>
+                                            <% if (task.moreInfo) { %>
+                                                <a href="/students/moreinfo/<%= task._id %>" class="more-info">More Info</a>
+                                            <% } %>
+                                        </div>
+                                        <label>
+                                            <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
+                                        </label>
                                     </div>
-                                    <label>
-                                        <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
-                                    </label>
-                                </div>
-                            <% }) %>
-                        </div>
-                    <% } %>
+                                <% }) %>
+                            </div>
+                        <% } %>
 
-                    <% if (newTasks.length > 0 && otherTasks.length > 0) { %>
-                        <h2>Other Incomplete Tasks</h2>
-                    <% } %>
+                        <% if (newTasks.length > 0 && otherTasks.length > 0) { %>
+                            <h2>Other Incomplete Tasks</h2>
+                        <% } %>
 
-                    <% if (otherTasks.length > 0) { %>
-                        <div class="task-list">
-                            <% otherTasks.forEach(task => { %>
-                                <div class="task-item">
-                                    <div class="task-details">
-                                        <strong>Description:</strong> <%= task.description %><br>
-                                        <% if (task.optionalDueDate) { %>
-                                            <strong>Due Date:</strong> <%= new Date(task.optionalDueDate).toLocaleDateString() %><br>
-                                        <% } %>
-                                        <strong>Class:</strong> <%= task.class.name %><br>
-                                        <strong>Importance:</strong> <%= task.importance %><br>
-                                        <% if (task.moreInfo) { %>
-                                            <a href="/students/moreinfo/<%= task._id %>" class="more-info">More Info</a>
-                                        <% } %>
+                        <% if (otherTasks.length > 0) { %>
+                            <div class="task-list">
+                                <% otherTasks.forEach(task => { %>
+                                    <div class="task-item">
+                                        <div class="task-details">
+                                            <strong>Description:</strong> <%= task.description %><br>
+                                            <% if (task.optionalDueDate) { %>
+                                                <strong>Due Date:</strong> <%= new Date(task.optionalDueDate).toLocaleDateString() %><br>
+                                            <% } %>
+                                            <strong>Class:</strong> <%= task.class.name %><br>
+                                            <strong>Importance:</strong> <%= task.importance %><br>
+                                            <% if (task.moreInfo) { %>
+                                                <a href="/students/moreinfo/<%= task._id %>" class="more-info">More Info</a>
+                                            <% } %>
+                                        </div>
+                                        <label>
+                                            <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
+                                        </label>
                                     </div>
-                                    <label>
-                                        <input type="checkbox" name="completedTasks" value="<%= task._id %>"> Mark as Complete
-                                    </label>
-                                </div>
-                            <% }) %>
-                        </div>
-                    <% } %>
+                                <% }) %>
+                            </div>
+                        <% } %>
 
-                    <button type="submit">Submit Changes</button><br><br>
-                    <% if (typeof message !== 'undefined' && message.trim()) { %>
-                        <div class="message <%= messageType %>"><%= message %></div>
-                    <% } %>
-                </form>
-            <% } %>
-            <button onclick="window.location.href='/students/student-dashboard'">Back to Dashboard</button>
+                        
+                <% } %>
+                
+            </div>
+            <button type="submit">Submit Changes</button><br><br>
+                        <% if (typeof message !== 'undefined' && message.trim()) { %>
+                            <div class="message <%= messageType %>"><%= message %></div>
+                        <% } %>
+                    </form>
+                <button onclick="window.location.href='/students/student-dashboard'">Back to Dashboard</button>
         </div>
     </div>
 </body>
