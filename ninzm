@@ -1,0 +1,287 @@
+[33mcommit 9d3e09731fad0abcd3a8daf37073c398861e2379[m[33m ([m[1;36mHEAD -> [m[1;32mbefore-testing-mistake[m[33m, [m[1;31morigin/before-testing-mistake[m[33m)[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Sun Jul 7 22:37:48 2024 +0100
+
+    just to speed things up
+
+[33mcommit 5bbe00d3c9da6b2ce6551ddc1a68f52088a53a0f[m[33m ([m[1;31morigin/main[m[33m)[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Sun Jul 7 02:20:36 2024 +0100
+
+    onto testing please
+
+[33mcommit 138092d22486939451e22b721aff64bf724d864c[m[33m ([m[1;32mmain[m[33m)[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Sun Jul 7 01:52:14 2024 +0100
+
+    this could be it... fuck it test maybe
+
+[33mcommit e61571a67baf2d7aacc307c6e06aae690bd4a095[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Sun Jul 7 01:17:45 2024 +0100
+
+    getting there more
+
+[33mcommit 1f9611bda7db4b3c7a43c3c32e5edeedcf2e136f[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Sat Jul 6 08:22:43 2024 +0100
+
+    student class details slightly better lol... maybe get that thing tomorrow
+
+[33mcommit 423cdba144422364d1e2f2c5a1a9efcb274b10bf[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Sat Jul 6 07:30:43 2024 +0100
+
+    create task fix
+
+[33mcommit bb0ba807c18a34e1e17051919b2f32302af95c92[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Sat Jul 6 06:44:35 2024 +0100
+
+    moreINfo added needs cleaning
+
+[33mcommit 2e82e00eb97faeb204452dca0a8b1b9f43e93009[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Sat Jul 6 05:44:17 2024 +0100
+
+    ok break fr
+
+[33mcommit cb0610d5c749f32d61107e15412440fca3c163b0[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Sat Jul 6 05:37:24 2024 +0100
+
+    taking a break
+
+[33mcommit b53036e020833a6436b1ddb2549a822758243a62[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Sat Jul 6 04:52:43 2024 +0100
+
+    delete class and new class notication wokring
+
+[33mcommit 5ba0c759d5697ae952d42df8da56967532ad3dcb[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Sat Jul 6 04:41:01 2024 +0100
+
+    delete class notifcation changes needed
+
+[33mcommit 71f94c3b60e57d630b6678727b16405598a793fb[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Sat Jul 6 01:35:12 2024 +0100
+
+    input valiation completed hopefully
+
+[33mcommit a1d7aff5354878af856f0ad0bb27f34f6e099919[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Sat Jul 6 01:04:07 2024 +0100
+
+    student settings input validation
+
+[33mcommit 1c800e80edd4f17eb87426dd03e3af6ad1eb0e5a[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Sat Jul 6 00:45:45 2024 +0100
+
+    login and register input validation
+
+[33mcommit 32ebeb312cb0ec5cb7688168983b9536e2184dd7[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Fri Jul 5 22:41:06 2024 +0100
+
+    validation started
+
+[33mcommit 44b115fe165de273c6397358575d3892ccbe71e1[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Fri Jun 28 03:54:29 2024 +0100
+
+    prototype v1.0 :)
+
+[33mcommit 9fb325e03b90f05bb959405c1ebd160290f517bd[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Fri Jun 28 02:56:16 2024 +0100
+
+    working hopefully
+
+[33mcommit 156c9a6763daa255d24624c54bfc5e96ef3e0111[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Thu Jun 27 21:46:58 2024 +0100
+
+    more front end changes
+
+[33mcommit 79ec148d7e52417753388cb937537048af9b213c[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Wed Jun 26 19:18:06 2024 +0100
+
+    prototype v.0.1
+
+[33mcommit 8b1b95e0716e27ea58bfac76cff558917dc6fac3[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Wed Jun 26 03:34:16 2024 +0100
+
+    version 2.0 initialised
+
+[33mcommit 122a2424c037ab898cbc1bb4d6847232d7532454[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Wed Jun 26 03:17:52 2024 +0100
+
+    more navbar tests on student side
+
+[33mcommit fdc9b4d5ccabcbfb78cd9af0ac859f9d36019ec1[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Mon Jun 24 23:20:14 2024 +0100
+
+    first navbar test working
+
+[33mcommit 96a6d3af3e7d424ffbad089eb931882f89cd9f09[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Mon Jun 24 19:52:02 2024 +0100
+
+    navbar started
+
+[33mcommit 74c14c163d5fbef02d9b64f1a06797f33523610f[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Mon Jun 24 17:34:54 2024 +0100
+
+    class details exteneded... frontend started
+
+[33mcommit 9ae7ae705109445b74a788ec6bcc6c47f8efc234[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Fri Jun 21 23:43:02 2024 +0100
+
+    incomplete tasks fixed
+
+[33mcommit a5ed90291ef1d8859c3ebd5d3647bb452b448f8b[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Fri Jun 21 23:10:53 2024 +0100
+
+    student attendance report
+
+[33mcommit d86f8b420d7e92031e46ca3835cdca7e066a283c[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Fri Jun 21 03:48:41 2024 +0100
+
+    working graph plus a lot of weird commits
+
+[33mcommit 8f802d390e9dbaf4eeff6e5584620675c2cbe4ce[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Wed Jun 19 19:58:07 2024 +0100
+
+    working 19/06
+
+[33mcommit 8663cb82c03f8ca2fbbce4cb2cb4e64984c39edb[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Wed Jun 19 01:12:14 2024 +0100
+
+    new password system  + teacher settings page
+
+[33mcommit 3665f8cb2fc7788d3031d6292683244eaddbfed5[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Tue Jun 18 19:17:00 2024 +0100
+
+    notification working... need to add new section
+
+[33mcommit be312ca13a6f49375fe2ecfef3acb6706d685398[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Mon Jun 17 22:53:01 2024 +0100
+
+    tasks redirect fixed
+
+[33mcommit 912f0ca51a2ae0e8543415bf64120febe103a17b[m
+Author: restlessjack <102357767+restlessjack@users.noreply.github.com>
+Date:   Mon Jun 17 22:26:54 2024 +0100
+
+    edit task v2
+
+[33mcommit ba27df453738445a2af136e47f5037cca19f6938[m[33m ([m[1;31morigin/before-notifications-kerfuffle[m[33m)[m
+Author: Edward Foster <alienblaster50@gmail.com>
+Date:   Mon Jun 17 00:03:32 2024 +0100
+
+    just before notification route change
+
+[33mcommit 1bd128d8c641e1d2e393472882726409607b53c8[m
+Author: Edward Foster <alienblaster50@gmail.com>
+Date:   Sat Jun 15 02:54:23 2024 +0100
+
+    due dates, importance levels
+
+[33mcommit 8eeeb2818c683ccb55de4d22e7d3f05d1562d8f3[m
+Author: Edward Foster <alienblaster50@gmail.com>
+Date:   Sat Jun 15 00:06:18 2024 +0100
+
+    incomplete tasks except mark as read
+
+[33mcommit 626774c75108fc73092a01c75aa6f45fa1cd4282[m
+Author: Edward Foster <alienblaster50@gmail.com>
+Date:   Tue Jun 11 00:17:01 2024 +0100
+
+    noficication percentage fixed
+
+[33mcommit 206411bbca29e94a4abbdf7dcd22b25f8cb31648[m
+Author: Edward Foster <alienblaster50@gmail.com>
+Date:   Mon Jun 10 22:01:36 2024 +0100
+
+    manage tasks added
+
+[33mcommit 7fb82d64e54185e7f3578ce66696abf636b6a873[m
+Author: Edward Foster <alienblaster50@gmail.com>
+Date:   Thu Jun 6 22:50:25 2024 +0100
+
+    edit class added not fully tested
+
+[33mcommit 929a63e112fbe3c0645a11f23f0fc17929d3e84e[m
+Author: Edward Foster <alienblaster50@gmail.com>
+Date:   Thu Jun 6 22:39:51 2024 +0100
+
+    merged classes and teachers
+
+[33mcommit 82e32abab3de5517b57cd8d1180094a3c277a337[m
+Author: Edward Foster <alienblaster50@gmail.com>
+Date:   Thu Jun 6 18:43:22 2024 +0100
+
+    notfifications
+
+[33mcommit 42e2f87252024d6d3c607ff342530189ca479657[m
+Author: Edward Foster <alienblaster50@gmail.com>
+Date:   Thu Jun 6 14:36:03 2024 +0100
+
+    incomplete tasks and percentages added
+
+[33mcommit b4a0eba5d224a9ea7725bc66866693d378f964e4[m
+Author: Edward Foster <alienblaster50@gmail.com>
+Date:   Thu Apr 25 13:47:58 2024 +0100
+
+    task started
+
+[33mcommit 84bd271d45a94eb10ff5914f8b0d6be020097b15[m
+Author: Edward Foster <alienblaster50@gmail.com>
+Date:   Mon Apr 22 01:38:39 2024 +0100
+
+    percentage working
+
+[33mcommit 3bb3f71201f4db61eb13bd15fceb3a6e863748e3[m
+Author: Edward Foster <alienblaster50@gmail.com>
+Date:   Sun Apr 21 14:53:41 2024 +0100
+
+    attendence percentages and student dashboard
+
+[33mcommit 7bc739309b3283d9aca937a8e9d920fb9c6b4c82[m
+Author: Edward Foster <alienblaster50@gmail.com>
+Date:   Sun Apr 21 04:30:36 2024 +0100
+
+    21/04 adding attendence
+
+[33mcommit 6b49fd13c8f9687bd459928fe283dc0d23908ca1[m
+Author: Edward Foster <alienblaster50@gmail.com>
+Date:   Fri Apr 19 15:30:45 2024 +0100
+
+    working class view
+
+[33mcommit e60e28d86604b47b6f33ef3f2c5e9573f8756836[m
+Author: Edward Foster <alienblaster50@gmail.com>
+Date:   Fri Apr 19 13:16:30 2024 +0100
+
+    19/04 landing page working
+
+[33mcommit 078d3ddfc77d368b759bc0f8c0ba88f960fb1c9a[m
+Author: Edward Foster <alienblaster50@gmail.com>
+Date:   Wed Apr 17 20:37:28 2024 +0100
+
+    working login
