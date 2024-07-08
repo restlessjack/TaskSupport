@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const User = require('./models/user'); // Adjust the path as necessary
 
-const mongoDbUrl = 'mongodb://localhost:27017/mydatabase'; // Your MongoDB URL
+const mongoDbUrl = 'mongodb://localhost:27017/mydatabase_demo'; // Your MongoDB URL
 
 mongoose.connect(mongoDbUrl, {
     useNewUrlParser: true,
@@ -10,7 +10,7 @@ mongoose.connect(mongoDbUrl, {
 }).then(async () => {
     console.log('Connected to MongoDB');
 
-    const username = 'jerry'; // Replace with the actual username
+    const username = 'Harper62'; // Replace with the actual username
     const newPassword = 'pass'; // Replace with the new password
 
     try {

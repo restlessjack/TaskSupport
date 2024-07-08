@@ -12,7 +12,7 @@ const teacherRoutes = require('./routes/teachers');
 const studentRoutes = require('./routes/students');
 const attendanceRoutes = require('./routes/attendances');
 
-const mongoDbUrl = 'mongodb://localhost:27017/mydatabase';
+const mongoDbUrl = 'mongodb://localhost:27017/mydatabase_demo';
 const app = express();
 
 app.set('view engine', 'ejs');
