@@ -100,7 +100,7 @@ router.post('/create', verifyTeacher, [
             students: studentIds.map(s => s._id)
         });
         await newClass.save();
-        res.status(201).json({ success: true, redirect: '/teachers/view-classes?message=Class Created Sucessfully&messageType=success' });
+        res.status(200).json({ success: true, redirect: '/teachers/view-classes?message=Class Created Sucessfully&messageType=success' });
         
     } catch (error) {
         console.error('Error creating class:', error);

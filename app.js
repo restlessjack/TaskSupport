@@ -1,3 +1,4 @@
+// app.js
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -5,15 +6,14 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const path = require('path');
 
-const indexRoutes = require('./routes/index');  // General or home page routes
-const userRoutes = require('./routes/users');  // User-specific routes
-const teacherRoutes = require('./routes/teachers');  // Teacher-specific routes
-const studentRoutes = require('./routes/students');  // Student-specific routes
-const attendanceRoutes = require('./routes/attendances');  // Attendance-specific routes
+const indexRoutes = require('./routes/index');
+const userRoutes = require('./routes/users');
+const teacherRoutes = require('./routes/teachers');
+const studentRoutes = require('./routes/students');
+const attendanceRoutes = require('./routes/attendances');
 
 const mongoDbUrl = 'mongodb://localhost:27017/mydatabase';
 const app = express();
-const port = process.env.PORT || 3000;
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -23,7 +23,6 @@ mongoose.connect(mongoDbUrl, { useNewUrlParser: true, useUnifiedTopology: true }
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Session configuration
 app.use(session({
     secret: 'your_secret_key',
     resave: false,
@@ -39,15 +38,10 @@ app.use((req, res, next) => {
     next();
 });
 
-// Setup routes
-app.use('/', indexRoutes);  // Home and general routes
-app.use('/users', userRoutes);  // User specific routes
-app.use('/students', studentRoutes);  // Student specific routes
-app.use('/teachers', teacherRoutes);  // Teacher specific routes
-app.use('/attendances', attendanceRoutes);  // Attendance specific routes
+app.use('/', indexRoutes);
+app.use('/users', userRoutes);
+app.use('/students', studentRoutes);
+app.use('/teachers', teacherRoutes);
+app.use('/attendances', attendanceRoutes);
 
-app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
-});
-
-
+module.exports = app;

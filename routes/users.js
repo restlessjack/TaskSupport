@@ -5,7 +5,6 @@ const bcrypt = require('bcryptjs');
 const { body, validationResult } = require('express-validator');
 
 // Registration route
-// Registration route
 router.post('/register', [
     body('username')
         .trim()
@@ -45,7 +44,8 @@ router.post('/register', [
             role
         });
         await user.save();
-        res.redirect('/login');
+
+        res.status(200).redirect('/login'); // Send 200 status on success and redirect to login
     } catch (error) {
         console.error('Registration Error:', error);
         res.status(500).render('register', { message: 'Error registering new user.', messageType: 'error' });
@@ -56,6 +56,7 @@ router.post('/register', [
 router.get('/register', (req, res) => {
     res.render('register', { message: '', messageType: '' });
 });
+
 // Login route
 router.post('/login', [
     body('username')
@@ -90,9 +91,9 @@ router.post('/login', [
 
         // Redirect based on role
         if (user.role === 'teacher') {
-            res.redirect('/teachers/dashboard');
+            return res.status(200).redirect('/teachers/dashboard');
         } else if (user.role === 'student') {
-            res.redirect('/students/student-dashboard');
+            return res.status(200).redirect('/students/student-dashboard');
         }
     } catch (error) {
         res.status(500).render('login', { message: 'Error logging in user.', messageType: 'error' });
