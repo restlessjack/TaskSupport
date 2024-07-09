@@ -138,6 +138,22 @@
         .spacing {
             margin-bottom: 30px;
         }
+
+        .message {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
@@ -295,9 +311,15 @@
                     <button type="button" id="add-moreinfo" class="add-field" onclick="toggleField('moreinfo-field', 'add-moreinfo', 'remove-moreinfo')">+ Add More Info</button>
 
                     <button type="submit">Add Task</button>
+                    <% if (typeof message !== 'undefined' && message.trim()) { %>
+                        <div class="message"><%= message %></div>
+                    <% } %>
+                    
                 </form>
+                
                 <button class="back-button" onclick="window.location.href='/teachers/view-classes'">Back to Classes</button>
             </div>
+            
         </div>
     </div>
 </body>

@@ -265,7 +265,7 @@ router.post('/create-task/:classId', verifyTeacher, [
             $push: { tasks: savedTask._id }
         });
 
-        res.redirect('/teachers/view-class/' + classId);
+        res.redirect('/teachers/view-class/' + classId + "?message=Task%20Added&messageType=success`");
     } catch (error) {
         console.error('Error creating task:', error);
         res.status(500).send('Failed to create task');
@@ -276,6 +276,8 @@ router.post('/create-task/:classId', verifyTeacher, [
 router.get('/view-class/:id', verifyTeacher, async (req, res) => {
     try {
         const classId = req.params.id;
+        const message = req.query.message || '';
+        const messageType = req.query.messageType || '';
         const classInfo = await Class.findById(classId)
             .populate('students', 'username')
             .populate({
@@ -312,7 +314,7 @@ router.get('/view-class/:id', verifyTeacher, async (req, res) => {
             };
         });
 
-        res.render('class-details', { classInfo, totalAttendancePercentage, studentAttendancePercentages });
+        res.render('class-details', { classInfo, totalAttendancePercentage, studentAttendancePercentages, message, messageType });
     } catch (error) {
         console.error('Error retrieving class details:', error);
         res.status(500).render('error', { message: 'Failed to load class details' });
