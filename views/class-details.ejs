@@ -234,6 +234,10 @@
                 <div class="chart-container">
                     <canvas id="attendanceChart"></canvas>
                 </div>
+
+                <% if (typeof message !== 'undefined' && message.trim()) { %>
+                    <div class="message"><%= message %></div>
+                <% } %>
                 
                 <div class="spacing"></div>
                 
@@ -311,9 +315,7 @@
                     <button type="button" id="add-moreinfo" class="add-field" onclick="toggleField('moreinfo-field', 'add-moreinfo', 'remove-moreinfo')">+ Add More Info</button>
 
                     <button type="submit">Add Task</button>
-                    <% if (typeof message !== 'undefined' && message.trim()) { %>
-                        <div class="message"><%= message %></div>
-                    <% } %>
+                   
                     
                 </form>
                 

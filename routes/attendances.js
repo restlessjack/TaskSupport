@@ -45,7 +45,7 @@ router.post('/attendance/:classId', verifyTeacher, async (req, res) => {
         await Class.findByIdAndUpdate(req.params.classId, {
             $push: { attendanceRecords: newAttendance._id }
         });
-        res.redirect('/teachers/view-class/' + req.params.classId);
+        res.redirect(`/teachers/view-class/${req.params.classId}?message=Attendance%20Recorded&messageType=success`);
     } catch (error) {
         console.error('Error recording attendance:', error);
         res.status(500).send('Error saving attendance record');
