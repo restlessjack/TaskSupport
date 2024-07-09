@@ -34,9 +34,23 @@
                 </select>
                 <button type="submit">Register</button>
             </form>
-            <% if (typeof message !== 'undefined' && message.trim()) { %>
-                <div class="message <%= messageType %>"><%= message %></div>
-            <% } %>
+                
+            <% if (typeof messages !== 'undefined' && messages.length > 0) { %>
+                <div class="message <%= messageType %>">
+                    <% messages.forEach(function(message) { %>
+                        <div>&#8226; <%= message %></div>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <div class="message">
+                    
+                    <div>&#8226; Username must be at least 6 characters long</div>
+                    <div>&#8226; Password must be at least 8 characters long</div>
+                    <div>&#8226; Password must contain a number, a lowercase letter, and an uppercase letter</div>
+
+                    
+                </div> <%}%>
+        
         </div>
     </div>
 </body>

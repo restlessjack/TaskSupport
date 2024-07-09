@@ -8,14 +8,14 @@ const { body, validationResult } = require('express-validator');
 router.post('/register', [
     body('username')
         .trim()
-        .isLength({ min: 3 }).withMessage('Username must be at least 3 characters long')
+        .isLength({ min: 6 }).withMessage('Username must be at least 6 characters long')
         .escape(),
     body('password')
         .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long')
         .matches(/\d/).withMessage('Password must contain a number')
         .matches(/[a-z]/).withMessage('Password must contain a lowercase letter')
         .matches(/[A-Z]/).withMessage('Password must contain an uppercase letter')
-        .matches(/[!@#$%^&*]/).withMessage('Password must contain a special character')
+       
         .escape(),
     body('role')
         .isIn(['teacher', 'student']).withMessage('Role must be either teacher or student')
@@ -25,11 +25,10 @@ router.post('/register', [
 
     if (!errors.isEmpty()) {
         return res.render('register', {
-            message: errors.array().map(error => error.msg).join(', '),
+            messages: errors.array().map(error => error.msg),
             messageType: 'error'
         });
     }
-
     try {
         const existingUser = await User.findOne({ username });
         if (existingUser) {
@@ -45,7 +44,7 @@ router.post('/register', [
         });
         await user.save();
 
-        res.status(200).redirect('/login'); // Send 200 status on success and redirect to login
+        res.status(200).render('login', { message: 'Success, please log in', messageType: 'success' }); // Send 200 status on success and redirect to login
     } catch (error) {
         console.error('Registration Error:', error);
         res.status(500).render('register', { message: 'Error registering new user.', messageType: 'error' });
