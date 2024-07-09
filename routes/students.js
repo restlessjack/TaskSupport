@@ -490,7 +490,12 @@ router.post('/settings', verifyStudent, [
             { attendanceThreshold, dueDateNotificationDays },
             { upsert: true, new: true }
         );
+    
 
+         // Trigger notification generation immediately after settings update
+         await generateAttendanceNotifications(req, res, async () => {});
+         await generateDueDateNotifications(req, res, async () => {});
+        
         res.render('student-settings', {
             settings,
             message: 'Settings updated successfully.',

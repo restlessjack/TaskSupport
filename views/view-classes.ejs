@@ -70,6 +70,21 @@
             color: #155724;
         }
     </style>
+
+
+<script>
+    // Check if the page needs to be refreshed to show updated data
+    if (window.location.search.includes('message=Class Updated Successfully')) {
+        // Remove the query parameter to prevent infinite reload loop
+        const url = new URL(window.location);
+        url.searchParams.delete('message');
+        url.searchParams.delete('messageType');
+        window.history.replaceState({}, document.title, url.toString());
+        
+        // Reload the page to ensure updated data is shown
+        window.location.reload();
+    }
+</script>
 </head>
 <body>
     <div class="wrapper">

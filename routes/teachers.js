@@ -153,7 +153,7 @@ router.post('/edit-class/:id', verifyTeacher, [
             students: studentIds.map(s => s._id)
         };
         await Class.findByIdAndUpdate(req.params.id, updatedClass);
-        res.redirect('/teachers/view-classes');
+        res.redirect('/teachers/view-classes?message=Class Updated Successfully&messageType=success');
     } catch (error) {
         console.error('Error updating class:', error);
         res.status(500).render('edit-class', {
