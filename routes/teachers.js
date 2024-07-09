@@ -328,6 +328,9 @@ router.get('/manage-tasks/:classId', verifyTeacher, async (req, res) => {
             return res.status(404).send('Class not found');
         }
 
+        // Reverse the tasks array
+        classInfo.tasks.reverse();
+
         res.render('manage-tasks', { classInfo });
     } catch (error) {
         console.error('Error retrieving tasks:', error);
