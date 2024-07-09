@@ -451,14 +451,19 @@ router.get('/settings', verifyStudent, async (req, res) => {
             await settings.save();
         }
 
-        res.render('student-settings', { settings, message: null, messageType: null });
+        res.render('student-settings', {
+            settings,
+            settingsMessage: null,
+            settingsMessageType: null,
+            passwordMessage: null,
+            passwordMessageType: null
+        });
     } catch (error) {
         console.error('Error loading settings:', error);
         res.status(500).send('Failed to load settings');
     }
 });
 
-// Update settings
 // Update settings
 router.post('/settings', verifyStudent, [
     body('attendanceThreshold')
@@ -477,8 +482,10 @@ router.post('/settings', verifyStudent, [
     if (!errors.isEmpty()) {
         return res.render('student-settings', {
             settings,
-            message: errors.array().map(error => error.msg).join(', '),
-            messageType: 'error'
+            settingsMessage: errors.array().map(error => error.msg).join(', '),
+            settingsMessageType: 'error',
+            passwordMessage: null,
+            passwordMessageType: null
         });
     }
 
@@ -490,22 +497,23 @@ router.post('/settings', verifyStudent, [
             { attendanceThreshold, dueDateNotificationDays },
             { upsert: true, new: true }
         );
-    
 
-         // Trigger notification generation immediately after settings update
-         await generateAttendanceNotifications(req, res, async () => {});
-         await generateDueDateNotifications(req, res, async () => {});
-        
+        settings.attendanceThreshold = attendanceThreshold;
+        settings.dueDateNotificationDays = dueDateNotificationDays;
+
         res.render('student-settings', {
             settings,
-            message: 'Settings updated successfully.',
-            messageType: 'success'
+            settingsMessage: 'Settings updated successfully.',
+            settingsMessageType: 'success',
+            passwordMessage: null,
+            passwordMessageType: null
         });
     } catch (error) {
         console.error('Error updating settings:', error);
         res.status(500).send('Failed to update settings');
     }
 });
+
 
 // Mark a notification as read
 router.post('/notifications/read/:id', verifyStudent, async (req, res) => {
@@ -607,8 +615,10 @@ router.post('/change-password', verifyStudent, [
     if (!errors.isEmpty()) {
         return res.render('student-settings', {
             settings,
-            message: errors.array().map(error => error.msg).join(', '),
-            messageType: 'error'
+            settingsMessage: null,
+            settingsMessageType: null,
+            passwordMessage: errors.array().map(error => error.msg).join(', '),
+            passwordMessageType: 'error'
         });
     }
 
@@ -617,15 +627,28 @@ router.post('/change-password', verifyStudent, [
         const result = await changeUserPassword(userId, oldPassword, newPassword, confirmPassword);
 
         if (result.success) {
-            res.render('student-settings', { settings, message: result.message, messageType: 'success' });
+            res.render('student-settings', {
+                settings,
+                settingsMessage: null,
+                settingsMessageType: null,
+                passwordMessage: result.message,
+                passwordMessageType: 'success'
+            });
         } else {
-            res.render('student-settings', { settings, message: result.message, messageType: 'error' });
+            res.render('student-settings', {
+                settings,
+                settingsMessage: null,
+                settingsMessageType: null,
+                passwordMessage: result.message,
+                passwordMessageType: 'error'
+            });
         }
     } catch (error) {
-        console.error('Error loading settings:', error);
-        res.status(500).send('Failed to load settings');
+        console.error('Error changing password:', error);
+        res.status(500).send('Failed to change password');
     }
 });
+
 
 
 

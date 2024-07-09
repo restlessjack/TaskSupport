@@ -94,6 +94,11 @@
                     
                     <button type="submit">Save Settings</button>
                 </form>
+                <% if (settingsMessage) { %>
+                    <div class="message <%= settingsMessageType %>">
+                        <%= settingsMessage %>
+                    </div>
+                <% } %>
             </div>
 
             <div class="section-spacing">
@@ -113,9 +118,11 @@
                 </form>
             </div>
             
-            <% if (message) { %>
-                <div class="message <%= messageType %>">
-                    <%= message %>
+            
+
+            <% if (passwordMessage) { %>
+                <div class="message <%= passwordMessageType %>">
+                    <%= passwordMessage %>
                 </div>
             <% } %>
 
