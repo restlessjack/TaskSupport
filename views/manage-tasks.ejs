@@ -54,6 +54,11 @@
         .task-container button.back-button:hover {
             background-color: #4360b5;
         }
+        .scroll-container {
+            max-height: 60vh; /* Set a max height for the container */
+            overflow-y: auto; /* Enable vertical scroll */
+            
+        }
     </style>
 </head>
 <body>
@@ -62,7 +67,7 @@
         <div class="main_container">
             <div class="task-container">
                 <h1>Tasks for <%= classInfo.name %>:</h1><br>
-
+                <div class="scroll-container">
                 <ul>
                     <% if (classInfo.tasks && classInfo.tasks.length > 0) { %>
                         <% classInfo.tasks.forEach(function(task) { %>
@@ -82,7 +87,7 @@
                         <li>No tasks assigned</li>
                     <% } %>
                 </ul>
-
+                </div>
                 <button class="back-button" onclick="window.location.href='/teachers/view-class/<%= classInfo._id %>'">Back to Class</button>
             </div>
         </div>

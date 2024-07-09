@@ -20,6 +20,11 @@
         button {
             margin-right: 10px;
         }
+        .notifications-container {
+            max-height: 70vh; /* Set a max height for the container */
+            overflow-y: auto; /* Enable vertical scroll */
+            margin-bottom: 20px; /* Add some margin at the bottom */
+        }
     </style>
 </head>
 <body>
@@ -27,6 +32,7 @@
         <%- include('_navbar', { userRole: userRole }) %>
         <div class="main_container">
     <h1>Notifications</h1>
+    <div class="notifications-container">
     <form action="/students/notifications/mark" method="post">
         <% notifications.forEach(function(notification) { %>
             <div class="notification <%= notification.read ? 'read' : 'unread' %>">
@@ -43,6 +49,7 @@
                 <% } %>
             </div>
         <% }) %>
+    </div>
         <button type="submit">Submit</button>
         <% if (typeof message !== 'undefined' && message.trim()) { %>
             <div class="message <%= messageType %>"><%= message %></div>
