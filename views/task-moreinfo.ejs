@@ -40,7 +40,7 @@
                 <p><strong>Importance:</strong> <%= task.importance %></p>
                 <p><strong>More Info:</strong> <%= task.moreInfo %></p>
             </div>
-            <button onclick="window.location.href='/students/student-class-details/<%= task.class._id %>'">Back to Class Details</button>
+            <button onclick="history.back()">Back</button>
         </div>
     </div>
 </body>
