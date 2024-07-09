@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="/css/navbar.css">
     <style>
         .task-container {
-            max-height: 50vh; /* Adjust the height as necessary */
+            max-height: 40vh; /* Adjust the height as necessary */
             overflow-y: auto;
             margin-bottom: 20px; /* Space between the container and the buttons */
             margin-top: 10px;
@@ -212,7 +212,7 @@
         <button onclick="window.location.href='/students/class-attendance-report/<%= classId %>'">View Attendance Report</button>
         <br>
         <br>
-        <button onclick="window.location.href='/students/student-dashboard'">Back to Dashboard</button>
+        
         <% if (typeof message !== 'undefined' && message.trim()) { %>
             <div class="message <%= messageType %>"><%= message %></div>
         <% } %>
